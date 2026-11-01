@@ -276,7 +276,7 @@ brewlite/
 
 Xem [CONTRIBUTING.md](CONTRIBUTING.md): tạo nhánh riêng, commit bằng tài khoản của mình, mở pull request và nhờ một bạn review trước khi merge.
 
-Sơ đồ phân công ban đầu: [docs/luong_code_tung_nguoi.pdf](docs/luong_code_tung_nguoi.pdf). Phần tài khoản ảo trong sơ đồ này đã được thay bằng VNPay (thầy đã đồng ý); phân công hiện tại xem bảng trong CONTRIBUTING.md.
+Phân công và luồng đặt món theo từng người: [docs/luong_code_tung_nguoi.pdf](docs/luong_code_tung_nguoi.pdf); file phụ trách cụ thể xem bảng trong CONTRIBUTING.md.
 
 ---
 
