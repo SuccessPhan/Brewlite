@@ -22,17 +22,23 @@ Khi chuyển sang cổng bên ngoài, thanh toán nằm ngoài transaction cơ s
 
 Giữ nguyên thanh toán giả lập. Cách này đơn giản và chạy được hoàn toàn ở local, nhưng không phản ánh quy trình thanh toán thực tế và không đáp ứng yêu cầu của giảng viên.
 
-### 2.2. VNPay sandbox
+Các phương án 2.2 đến 2.4 đều tích hợp VNPay sandbox và khác nhau ở **cách nhận kết quả thanh toán**.
 
-Tích hợp API VNPay 2.1.0 trên môi trường thử nghiệm. Khách được chuyển sang trang VNPay để nhập thẻ test, kết quả trả về qua Return URL và IPN. Cách này sát thực tế, đáp ứng yêu cầu của giảng viên, nhưng phải xử lý chữ ký, trùng lặp kết quả và đối soát.
+### 2.2. VNPay sandbox, chỉ nhận kết quả qua Return URL
 
-### 2.3. Cổng thanh toán khác
+Chỉ dựa vào việc trình duyệt khách được chuyển về trang của hệ thống. Cách này đơn giản và chạy được ở local, nhưng nếu khách đóng trình duyệt hoặc mất mạng trước khi quay về thì hệ thống không biết kết quả, dù khách đã bị trừ tiền.
 
-Các cổng khác cần đăng ký tài khoản và tìm hiểu tài liệu riêng, tốn thêm thời gian của một nhóm nhỏ, trong khi yêu cầu của giảng viên nêu cụ thể là sandbox VNPay.
+### 2.3. VNPay sandbox, chỉ nhận kết quả qua IPN
+
+Máy chủ VNPay gọi thẳng về máy chủ của hệ thống, không phụ thuộc trình duyệt nên đáng tin hơn. Tuy nhiên IPN cần địa chỉ truy cập được từ internet, nên môi trường local không nhận được; giao diện cũng cần một cách để biết kết quả khi khách quay về.
+
+### 2.4. VNPay sandbox, nhận qua cả Return URL và IPN, có đối soát
+
+Cả hai kênh cùng kiểm chữ ký và số tiền, rồi cùng đi qua một hàm ghi nhận idempotent. Có thêm đối soát bằng `querydr` khi không nhận được kết quả. Cách này bù được điểm yếu của từng kênh, nhưng phải xử lý hai kênh đến trùng hoặc đồng thời, và tốn thêm công cài đặt, kiểm thử.
 
 ## 3. Quyết định (Decision)
 
-Nhóm chọn **thanh toán qua VNPay sandbox** và bỏ ví ảo. Thanh toán bằng điểm của BrewLite được giữ lại như một phương thức riêng.
+Nhóm chọn **thanh toán qua VNPay sandbox** và bỏ ví ảo, theo **phương án 2.4**: nhận kết quả qua cả Return URL và IPN, có đối soát. Thanh toán bằng điểm của BrewLite được giữ lại như một phương thức riêng.
 
 1. **Khởi tạo.** `POST /payments` (có header `Idempotency-Key`) tạo `Payment` ở trạng thái `PROCESSING`, tạo link VNPay API 2.1.0 và ký bằng HMAC-SHA512 với `VNP_HASH_SECRET`. Link hết hạn sau 15 phút (`vnp_ExpireDate`).
 2. **Nhận kết quả.** Qua Return URL (`GET /payments/vnpay/return`) và IPN (`GET /payments/vnpay/ipn`). Cả hai kiểm tra chữ ký và số tiền (`vnp_Amount / 100`) trước khi ghi nhận. IPN trả mã 97 khi sai chữ ký, mã 04 khi sai số tiền.
@@ -49,7 +55,9 @@ Nhóm chọn **thanh toán qua VNPay sandbox** và bỏ ví ảo. Thanh toán b�
 
 **Thứ ba, an toàn.** Chữ ký HMAC-SHA512 và kiểm tra số tiền ngăn tham số bị sửa. Ghi nhận qua `applyResult()` idempotent ngăn cộng điểm hoặc đổi trạng thái đơn hai lần khi Return và IPN đến cùng lúc.
 
-**Thứ tư, giữ được thanh toán bằng điểm.** Phương thức này không đi qua cổng ngoài nên vẫn nằm trong một transaction nội bộ và không cần đối soát.
+**Thứ tư, chọn phương án 2.4 thay vì chỉ một kênh.** Return URL một mình dễ mất kết quả khi khách đóng trình duyệt, IPN một mình không chạy được ở local. Dùng cả hai cùng đối soát khắc phục được cả hai điểm yếu, với cái giá là phải đảm bảo ghi nhận một lần.
+
+**Thứ năm, giữ được thanh toán bằng điểm.** Phương thức này không đi qua cổng ngoài nên vẫn nằm trong một transaction nội bộ và không cần đối soát.
 
 ## 5. Hệ quả của quyết định (Consequences)
 
