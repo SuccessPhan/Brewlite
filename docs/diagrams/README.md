@@ -25,13 +25,13 @@ Sequence-01 mô tả UC-06 với đủ các lifeline tối thiểu Customer → 
 | Idempotency khi client gửi lại | Khối `opt` bước 28–31: cùng khoá trả lại giao dịch cũ, `replayed: true` |
 | Thông báo kết quả cuối cùng | Bước 44 (xác nhận PAID, mã giao dịch VNPay) và bước 50 (báo thất bại, giữ giỏ) |
 
-![Hình 3.2. Sequence-01: đặt và thanh toán đơn hàng qua VNPay](./sequence-checkout.png)
+> Hình 3.2. Sequence-01: đặt và thanh toán đơn hàng qua VNPay – **chưa có sơ đồ** (`sequence-checkout.puml`).
 
 ## Task 2.3 – Class diagram
 
 Class-01 ở mức domain, bám đúng `backend/prisma/schema.prisma`. Đủ các lớp đề yêu cầu: User, Product, Order, OrderItem, Payment, **Promotion** (hiện thực bằng bảng `Voucher`) và LoyaltyTransaction; thêm Topping và PaymentLog. Sơ đồ có thuộc tính chính, quan hệ kèm multiplicity và các enum trạng thái OrderStatus, PaymentStatus, PaymentMethod, Size, Fulfillment, VoucherType.
 
-![Hình 3.3. Class-01: sơ đồ lớp mức domain](./class-domain.png)
+> Hình 3.3. Class-01: sơ đồ lớp mức domain – **chưa có sơ đồ** (`class-domain.puml`).
 
 | Quan hệ | Multiplicity | Ý nghĩa |
 |---|---|---|
