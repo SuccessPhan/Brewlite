@@ -15,7 +15,7 @@ bằng **tài khoản GitHub của chính mình**. Không nhờ người khác c
 4. Tải code về và chạy thử theo README:
    ```bash
    git clone <link-repo>
-   cd brewlite
+   cd Brewlite/brewlite
    ```
 
 ## 2. Mỗi lần làm một việc
@@ -66,7 +66,7 @@ Không chắc thì hỏi bạn đã viết đoạn code kia, đừng xoá code c
 
 ## 5. Phân chia phần code
 
-Mỗi bạn phụ trách phần code dưới đây và vẽ các sơ đồ UML của đúng phần đó. Sửa vào phần của bạn khác thì nhắn trước và gắn bạn đó vào review.
+Mỗi bạn phụ trách phần code dưới đây và vẽ các sơ đồ UML của đúng phần đó. Sửa vào phần của bạn khác thì nhắn trước và gắn bạn đó vào review. Đường dẫn trong bảng tính từ thư mục `brewlite/`, riêng `.github/` nằm ở thư mục gốc repo.
 
 | Thành viên | Phần phụ trách | Thư mục / file chính |
 |---|---|---|
