@@ -82,7 +82,7 @@ function PromoBox() {
             <CheckIcon className="h-4 w-4" /> Đã lưu mã, sẽ tự áp khi thanh toán
           </p>
           <div className="mt-2 flex items-center gap-3">
-            <Link href={cartCount > 0 ? '/checkout' : '#menu'} className="inline-flex h-10 items-center bg-gold px-4 font-label text-xs font-semibold uppercase tracking-wider text-foam hover:bg-gold-deep">
+            <Link href={cartCount > 0 ? '/checkout' : '/menu'} className="inline-flex h-10 items-center bg-gold px-4 font-label text-xs font-semibold uppercase tracking-wider text-foam hover:bg-gold-deep">
               {cartCount > 0 ? 'Đi tới thanh toán' : 'Chọn món ngay'}
             </Link>
             <button type="button" onClick={() => setSavedVoucher(null)} className="text-xs text-roast/60 underline underline-offset-4 hover:text-gold">

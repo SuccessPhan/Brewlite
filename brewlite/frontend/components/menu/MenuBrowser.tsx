@@ -33,12 +33,14 @@ const SORTS: { id: Sort; label: string }[] = [
 
 interface Props {
   initialQuery?: string;
+  /** Nhóm món mở sẵn, ví dụ từ ô "Thực đơn theo nhóm" ở trang nhất (/menu?nhom=banh-ngot) */
+  initialCategory?: CategoryId;
   title: string;
 }
 
-export default function MenuBrowser({ initialQuery = '', title }: Props) {
+export default function MenuBrowser({ initialQuery = '', initialCategory, title }: Props) {
   const { favorites, signedIn } = useFavorites();
-  const [filter, setFilter] = useState<Filter>('all');
+  const [filter, setFilter] = useState<Filter>(initialCategory ?? 'all');
   const [sort, setSort] = useState<Sort>('popular');
   const [query, setQuery] = useState(initialQuery);
   const [page, setPage] = useState(1);

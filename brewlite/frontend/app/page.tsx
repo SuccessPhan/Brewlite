@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import HomeSidebar from '@/components/home/HomeSidebar';
 import BestSellerRail from '@/components/menu/BestSellerRail';
-import MenuBrowser from '@/components/menu/MenuBrowser';
+import CategoryShelf from '@/components/menu/CategoryShelf';
 import { HERO_IMAGE, photo } from '@/lib/images';
 import { BellIcon, CupIcon, WalletIcon } from '@/components/ui/Icons';
 
@@ -30,7 +30,7 @@ export default function HomePage() {
             Đặt món trên điện thoại trước khi ra khỏi nhà, tới quầy là có ly. Mỗi 1.000đ bạn được tích 1 điểm, dùng để đổi bánh, nâng size hoặc trừ thẳng vào đơn sau.
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
-            <Link href="#menu" className="inline-flex h-12 items-center bg-gold px-7 font-label text-sm font-semibold uppercase tracking-wider text-foam hover:bg-gold-deep">
+            <Link href="/menu" className="inline-flex h-12 items-center bg-gold px-7 font-label text-sm font-semibold uppercase tracking-wider text-foam hover:bg-gold-deep">
               Đặt món ngay
             </Link>
             <Link href="/uu-dai" className="inline-flex h-12 items-center border-2 border-roast px-6 font-label text-sm font-semibold uppercase tracking-wider hover:bg-roast hover:text-cream">
@@ -74,8 +74,8 @@ export default function HomePage() {
         <BestSellerRail />
       </div>
 
-      <div className="mt-12" id="menu">
-        <MenuBrowser title="Thực đơn hôm nay" />
+      <div className="mt-12">
+        <CategoryShelf />
       </div>
     </main>
   );
