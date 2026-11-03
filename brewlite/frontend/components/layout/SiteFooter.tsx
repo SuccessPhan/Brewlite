@@ -13,7 +13,7 @@ const COLUMNS = [
     ],
   },
   {
-    title: 'Tòa soạn',
+    title: 'Về BrewLite',
     links: [
       { href: '/cau-chuyen', label: 'Câu chuyện BrewLite' },
       { href: '/lien-he', label: 'Liên hệ, góp ý' },

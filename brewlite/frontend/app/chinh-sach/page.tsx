@@ -39,9 +39,9 @@ const SECTIONS = [
 
 export default function PolicyPage() {
   return (
-    <Article kicker="Văn bản" title="Chính sách và điều khoản" lead="Áp dụng cho mọi đơn đặt trên BrewLite.">
+    <Article kicker="Quy định" title="Chính sách và điều khoản" lead="Áp dụng cho mọi đơn đặt trên BrewLite.">
       {SECTIONS.map((s, i) => (
-        <section key={s.id} id={s.id} className="scroll-mt-36 border-t-[3px] border-double border-roast pb-8 pt-4">
+        <section key={s.id} id={s.id} className="scroll-mt-36 border-t-[3px] border-double border-roast pb-8 pt-4 first:border-t-0 first:pt-0">
           <h2 className="text-2xl font-black">
             <span className="text-gold">Điều {i + 1}.</span> {s.title}
           </h2>

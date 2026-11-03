@@ -129,7 +129,7 @@ const FAQ_GROUPS: { id: string; title: string; items: Faq[] }[] = [
 
 export default function ContactPage() {
   return (
-    <Article kicker="Hộp thư toà soạn" title="Liên hệ và hỏi đáp" lead="Phần lớn câu hỏi về đơn hàng, thanh toán và điểm đã có lời đáp bên dưới. Chưa thấy câu của bạn thì gửi thư cho quán ở cuối trang.">
+    <Article kicker="Hỗ trợ khách hàng" title="Liên hệ và hỏi đáp" lead="Phần lớn câu hỏi về đơn hàng, thanh toán và điểm đã có lời đáp bên dưới. Chưa thấy câu của bạn thì gửi thư cho quán ở cuối trang.">
       <div className="grid gap-6 sm:grid-cols-2">
         <section className="border-2 border-roast p-5">
           <h2 className="kicker">Quầy nhận món</h2>
