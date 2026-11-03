@@ -3,11 +3,12 @@ import HomeSidebar from '@/components/home/HomeSidebar';
 import BestSellerRail from '@/components/menu/BestSellerRail';
 import MenuBrowser from '@/components/menu/MenuBrowser';
 import { HERO_IMAGE, photo } from '@/lib/images';
+import { BellIcon, CupIcon, WalletIcon } from '@/components/ui/Icons';
 
 const STEPS = [
-  { n: 'I', title: 'Chọn món', text: 'Chọn size, độ ngọt, lượng đá và topping theo đúng khẩu vị của bạn.' },
-  { n: 'II', title: 'Thanh toán', text: 'Trả bằng thẻ ATM, thẻ quốc tế, quét QR qua VNPay hoặc dùng điểm BrewLite.' },
-  { n: 'III', title: 'Nhận món', text: 'Ly sẵn sàng là web báo ngay. Tới quầy đọc mã đơn là nhận, không phải xếp hàng.' },
+  { n: 'I', Icon: CupIcon, title: 'Chọn món', text: 'Chọn size, độ ngọt, lượng đá và topping theo đúng khẩu vị của bạn.' },
+  { n: 'II', Icon: WalletIcon, title: 'Thanh toán', text: 'Trả bằng thẻ ATM, thẻ quốc tế, quét QR qua VNPay hoặc dùng điểm BrewLite.' },
+  { n: 'III', Icon: BellIcon, title: 'Nhận món', text: 'Ly sẵn sàng là web báo ngay. Tới quầy đọc mã đơn là nhận, không phải xếp hàng.' },
 ];
 
 export default function HomePage() {
@@ -37,17 +38,28 @@ export default function HomePage() {
             </Link>
           </div>
 
-          {/* Ba bước đặt món, chia cột như một mục chuyên đề ngay dưới bài chính */}
-          <section className="mt-10 border-y-[3px] border-double border-roast py-6" aria-labelledby="how-title">
-            <h2 id="how-title" className="text-3xl font-black">
+          {/* Ba bước đặt món: khung "hướng dẫn" viền kép như mục chuyên đề trên báo xưa */}
+          <section className="relative mt-12 border-[3px] border-double border-roast px-5 pb-7 pt-8 sm:px-8" aria-labelledby="how-title">
+            <p className="kicker absolute -top-2.5 left-1/2 -translate-x-1/2 bg-cream px-3">Hướng dẫn</p>
+            <h2 id="how-title" className="text-center text-3xl font-black sm:text-4xl">
               Đặt món chỉ ba bước
             </h2>
-            <ol className="mt-5 grid gap-6 md:grid-cols-3 md:gap-0">
+            <p className="mt-1 text-center font-serif italic text-roast/70">Từ lúc mở web tới lúc cầm ly cà phê trên tay</p>
+            <ol className="mt-8 grid gap-8 md:grid-cols-3 md:gap-6">
               {STEPS.map((s, i) => (
-                <li key={s.n} className={`md:px-5 ${i > 0 ? 'md:border-l md:border-roast' : 'md:pl-0'}`}>
-                  <span className="font-display text-4xl font-black text-gold">{s.n}.</span>
-                  <h3 className="mt-1 text-xl font-bold">{s.title}</h3>
-                  <p className="mt-1 text-[15px] leading-relaxed text-roast/80">{s.text}</p>
+                <li key={s.n} className="relative text-center">
+                  {/* Mũi tên chấm nối sang bước kế tiếp */}
+                  {i < STEPS.length - 1 && (
+                    <span className="absolute left-[calc(50%+2.75rem)] right-[calc(-50%+2.75rem)] top-8 hidden border-t-2 border-dotted border-roast/50 md:block" aria-hidden="true">
+                      <span className="absolute -right-1 -top-[7px] text-xs text-roast/60">▶</span>
+                    </span>
+                  )}
+                  <span className="keep-round mx-auto grid h-16 w-16 place-items-center rounded-full border-2 border-roast bg-cream text-gold">
+                    <s.Icon className="h-7 w-7" />
+                  </span>
+                  <p className="kicker mt-3">Bước {s.n}</p>
+                  <h3 className="mt-1 font-display text-2xl font-black italic">{s.title}</h3>
+                  <p className="mx-auto mt-2 max-w-[16rem] text-[15px] leading-relaxed text-roast/80">{s.text}</p>
                 </li>
               ))}
             </ol>
