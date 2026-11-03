@@ -19,6 +19,10 @@ import Skeleton from '@/components/ui/Skeleton';
 import Toast from '@/components/ui/Toast';
 import { LogoutIcon } from '@/components/ui/Icons';
 
+/** Số quà đổi được ngay và số dòng lịch sử điểm hiện sẵn, phần còn lại thu gọn */
+const READY_SHOWN = 3;
+const LOG_SHOWN = 5;
+
 export default function AccountView() {
   const router = useRouter();
   const { user, logout } = useAuth();
@@ -27,10 +31,14 @@ export default function AccountView() {
   const [invoice, setInvoice] = useState<Order | null>(null);
   const [toast, setToast] = useState<string | null>(null);
   const { redeem: redeemReward, redeeming } = useRedeem();
+  const [showAllLog, setShowAllLog] = useState(false);
 
   if (!user) return null;
 
   const tier = tierOf(user.points);
+  // Quà đủ điểm: món giá trị cao xếp trước; quà kế tiếp là món rẻ nhất còn thiếu điểm
+  const ready = REWARDS.filter((r) => r.cost <= user.points).sort((a, b) => b.cost - a.cost);
+  const next = REWARDS.filter((r) => r.cost > user.points).sort((a, b) => a.cost - b.cost)[0];
   const memberSince = new Date(user.createdAt).toLocaleDateString('vi-VN', { month: '2-digit', year: 'numeric' });
 
   function reorder(order: Order) {
@@ -143,37 +151,65 @@ export default function AccountView() {
           )}
         </section>
 
-        {/* Đổi quà (trang nhất dẫn tới đây qua #doi-qua) */}
+        {/* Đổi quà: chỉ tóm tắt quà đổi được ngay và quà kế tiếp; danh sách đầy đủ ở trang Ưu đãi */}
         <section id="doi-qua" className="scroll-mt-36 rounded-3xl bg-foam p-5 sm:p-6">
-          <h2 className="text-lg font-extrabold">Đổi quà bằng điểm</h2>
-          <ul className="mt-3 space-y-2">
-            {REWARDS.map((r) => {
-              const enough = user.points >= r.cost;
-              return (
-                <li key={r.id} className="flex items-center justify-between gap-3 rounded-2xl bg-cream px-4 py-3">
-                  <span>
-                    <span className="block font-semibold">{r.name}</span>
-                    <span className="block text-xs tabular-nums text-roast/60">{formatNumber(r.cost)} điểm</span>
-                  </span>
-                  <button
-                    type="button"
-                    disabled={!enough || redeeming !== null}
-                    onClick={() => redeem(r.id)}
-                    className="shrink-0 rounded-full bg-gold px-4 py-2 text-sm font-bold text-roast enabled:hover:bg-gold-deep enabled:hover:text-foam disabled:cursor-not-allowed disabled:bg-roast/10 disabled:text-roast/40"
-                  >
-                    {redeeming === r.id ? 'Đang đổi…' : enough ? 'Đổi quà' : 'Chưa đủ điểm'}
-                  </button>
-                </li>
-              );
-            })}
-          </ul>
+          <div className="flex items-baseline justify-between gap-3">
+            <h2 className="text-lg font-extrabold">Đổi quà bằng điểm</h2>
+            <span className="text-sm text-roast/60">
+              Bạn có <b className="tabular-nums text-roast">{formatNumber(user.points)}</b> điểm
+            </span>
+          </div>
+
+          {ready.length > 0 ? (
+            <>
+              <p className="kicker mt-4">Đổi được ngay</p>
+              <ul className="mt-2 space-y-2">
+                {ready.slice(0, READY_SHOWN).map((r) => (
+                  <li key={r.id} className="flex items-center justify-between gap-3 rounded-2xl bg-cream px-4 py-3">
+                    <span>
+                      <span className="block font-semibold">{r.name}</span>
+                      <span className="block text-xs tabular-nums text-roast/60">{formatNumber(r.cost)} điểm</span>
+                    </span>
+                    <button
+                      type="button"
+                      disabled={redeeming !== null}
+                      onClick={() => redeem(r.id)}
+                      className="shrink-0 rounded-full bg-gold px-4 py-2 text-sm font-bold text-foam enabled:hover:bg-gold-deep disabled:opacity-50"
+                    >
+                      {redeeming === r.id ? 'Đang đổi…' : 'Đổi quà'}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+              {ready.length > READY_SHOWN && <p className="mt-2 text-sm text-roast/60">Và {ready.length - READY_SHOWN} quà khác bạn cũng đủ điểm.</p>}
+            </>
+          ) : (
+            <p className="mt-4 text-sm text-roast/70">Chưa đủ điểm cho món quà nào. Mỗi 1.000đ trả qua VNPay được cộng 1 điểm.</p>
+          )}
+
+          {next && (
+            <div className="mt-4 rounded-2xl border-2 border-dashed border-roast/30 px-4 py-3">
+              <p className="kicker">Quà kế tiếp</p>
+              <p className="mt-1 font-semibold">{next.name}</p>
+              <div className="mt-2 h-2 overflow-hidden bg-roast/10" role="progressbar" aria-valuemin={0} aria-valuemax={next.cost} aria-valuenow={user.points} aria-label={`Tiến độ tới ${next.name}`}>
+                <div className="h-full bg-gold" style={{ width: `${Math.min(100, (user.points / next.cost) * 100)}%` }} />
+              </div>
+              <p className="mt-1 text-xs tabular-nums text-roast/60">
+                {formatNumber(user.points)} / {formatNumber(next.cost)} điểm · còn thiếu {formatNumber(next.cost - user.points)}
+              </p>
+            </div>
+          )}
+
+          <Link href="/uu-dai#rewards-title" className="mt-4 inline-block font-label text-xs font-semibold uppercase tracking-wider underline underline-offset-4 hover:text-gold">
+            Xem tất cả {REWARDS.length} quà →
+          </Link>
         </section>
 
-        {/* Lịch sử điểm */}
+        {/* Lịch sử điểm: 5 dòng mới nhất, bấm Xem thêm để mở hết */}
         <section className="rounded-3xl bg-foam p-5 sm:p-6">
           <h2 className="text-lg font-extrabold">Lịch sử tích điểm</h2>
           <ul className="mt-3 divide-y divide-roast/10">
-            {user.pointsLog.slice(0, 8).map((e) => (
+            {(showAllLog ? user.pointsLog : user.pointsLog.slice(0, LOG_SHOWN)).map((e) => (
               <li key={e.id} className="flex items-baseline justify-between gap-3 py-2.5 text-sm">
                 <span>
                   <span className="block font-medium">{e.label}</span>
@@ -186,6 +222,11 @@ export default function AccountView() {
               </li>
             ))}
           </ul>
+          {user.pointsLog.length > LOG_SHOWN && (
+            <button type="button" onClick={() => setShowAllLog((v) => !v)} className="mt-2 font-label text-xs font-semibold uppercase tracking-wider underline underline-offset-4 hover:text-gold">
+              {showAllLog ? 'Thu gọn' : `Xem thêm ${user.pointsLog.length - LOG_SHOWN} dòng`}
+            </button>
+          )}
         </section>
       </div>
 
