@@ -175,8 +175,7 @@ export default function ProductCustomizer({ product, initial, variant, submitLab
         }
       >
         {preview ? (
-          <div className="mx-auto flex max-w-5xl items-center justify-between gap-3 border-2 border-dashed border-roast/40 px-4 py-3 text-sm">
-            <span className="text-roast/70">Bạn đang xem với vai trò quản lý. Khách thấy nút đặt món ở đây.</span>
+          <div className="mx-auto flex max-w-5xl justify-end">
             <Link href={`/quan-ly/thuc-don?sua=${product.id}`} className="shrink-0 bg-roast px-4 py-2 font-label text-xs font-semibold uppercase tracking-wider text-cream">
               Sửa món này
             </Link>
