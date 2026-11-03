@@ -95,9 +95,11 @@ export default function ProductCustomizer({ product, initial, variant, submitLab
       </div>
       <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
         <span className="text-xl font-bold tabular-nums text-espresso">{formatVnd(product.price)}</span>
-        <span className="inline-flex items-center gap-1 text-roast/70">
-          <StarIcon className="h-4 w-4 text-gold" /> {product.rating.toFixed(1).replace('.', ',')}
-        </span>
+        {product.rating > 0 && (
+          <span className="inline-flex items-center gap-1 text-roast/70">
+            <StarIcon className="h-4 w-4 text-gold" /> {product.rating.toFixed(1).replace('.', ',')}
+          </span>
+        )}
         {soldOut ? (
           <span className="rounded-full bg-chili/10 px-2.5 py-0.5 text-xs font-bold text-chili">Hết hàng</span>
         ) : product.stock <= 10 ? (

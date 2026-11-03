@@ -151,11 +151,14 @@ export const FEEDBACK_STATUS_LABEL: Record<FeedbackStatus, string> = { new: 'M�
 
 interface StorefrontState {
   products: Record<string, ProductEdit>;
+  /** Món quản lý mới thêm (chưa có trên máy chủ) */
+  added: Product[];
   vouchers: Voucher[];
   content: SiteContent;
   feedback: Record<string, FeedbackState>;
   log: ChangeLog[];
   editProduct: (id: string, patch: ProductEdit, label?: string) => void;
+  addProduct: (p: Product) => void;
   editProducts: (ids: string[], patch: ProductEdit, label: string) => void;
   resetProduct: (id: string, label: string) => void;
   saveVoucher: (v: Voucher, original?: string) => void;
@@ -170,6 +173,7 @@ const entry = (text: string, href: string): ChangeLog => ({ id: ++logId, at: new
 
 export const useStorefront = create<StorefrontState>((set) => ({
   products: {},
+  added: [],
   vouchers: VOUCHERS,
   content: DEFAULT_CONTENT,
   feedback: {},
@@ -180,6 +184,8 @@ export const useStorefront = create<StorefrontState>((set) => ({
       products: { ...s.products, [id]: { ...s.products[id], ...patch } },
       log: label ? [entry(label, `/quan-ly/thuc-don?sua=${id}`), ...s.log].slice(0, 30) : s.log,
     })),
+
+  addProduct: (p) => set((s) => ({ added: [...s.added, p], log: [entry(`Thêm món ${p.name}`, `/quan-ly/thuc-don?sua=${p.id}`), ...s.log].slice(0, 30) })),
 
   editProducts: (ids, patch, label) =>
     set((s) => {

@@ -1,13 +1,15 @@
 'use client';
 
 // CÔNG THỨC: bảng gọn mỗi món một dòng (giá bán, giá vốn mỗi ly, lãi gộp, còn pha được);
-// bấm một dòng mở khung định lượng chi tiết từng nguyên liệu.
+// bấm một dòng mở khung định lượng chi tiết, sửa được công thức; món chưa có công thức thì thêm mới.
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
 import { formatVnd } from '@/lib/format';
 import { cupsLeft, recipeCost, stateOf, useInventory, type Recipe } from '@/lib/inventory';
-import { useProductMap } from '@/lib/products';
-import { FilterTile, PageHead, Panel, SidePanel, StockBadge, num, td, th, toolSelect, tr } from './ui';
+import { useAllProducts, useProductMap } from '@/lib/products';
+import Toast from '@/components/ui/Toast';
+import RecipeEditor from './RecipeEditor';
+import { FilterTile, PageHead, Panel, SidePanel, StockBadge, btnLine, btnSolid, num, td, th, toolSelect, tr } from './ui';
 
 type Sort = 'cups' | 'margin' | 'name';
 
@@ -17,6 +19,11 @@ export default function Recipes() {
   const map = useMemo(() => new Map(ingredients.map((i) => [i.id, i])), [ingredients]);
   const [sort, setSort] = useState<Sort>('cups');
   const [openId, setOpenId] = useState<string | null>(null);
+  const [newFor, setNewFor] = useState<string | null>(null);
+  const [toast, setToast] = useState<string | null>(null);
+  const { data: allProducts = [] } = useAllProducts();
+  const missing = allProducts.filter((p) => !recipes.some((r) => r.productId === p.id));
+  const newProduct = allProducts.find((p) => p.id === newFor) ?? null;
 
   const rows = useMemo(
     () =>
@@ -37,7 +44,27 @@ export default function Recipes() {
 
   return (
     <>
-      <PageHead title="Công thức" lead="Định lượng cho ly size M, bánh tính theo cái. Giá vốn theo giá vốn bình quân hiện tại." />
+      <PageHead
+        title="Công thức"
+        lead="Định lượng cho ly size M, bánh tính theo cái. Giá vốn theo giá vốn bình quân hiện tại."
+        actions={
+          missing.length > 0 && (
+            <select
+              value=""
+              onChange={(e) => e.target.value && setNewFor(e.target.value)}
+              className={`${toolSelect} h-10 font-label text-xs font-semibold uppercase tracking-wider`}
+              aria-label="Thêm công thức cho món"
+            >
+              <option value="">+ Thêm công thức ({missing.length} món chưa có)</option>
+              {missing.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.name}
+                </option>
+              ))}
+            </select>
+          )
+        }
+      />
 
       <div className="mt-5 grid grid-cols-3 gap-3">
         <FilterTile label="Giá vốn trung bình" value={formatVnd(avgCost)} />
@@ -105,13 +132,46 @@ export default function Recipes() {
         </div>
       </Panel>
 
-      {opened && <RecipePanel recipe={opened.r} name={opened.name} price={opened.price} cost={opened.cost} margin={opened.margin} onClose={() => setOpenId(null)} />}
+      {opened && <RecipePanel recipe={opened.r} name={opened.name} price={opened.price} cost={opened.cost} margin={opened.margin} onClose={() => setOpenId(null)} onSaved={setToast} />}
+      {newProduct && (
+        <SidePanel open wide title={`Công thức: ${newProduct.name}`} onClose={() => setNewFor(null)}>
+          <RecipeEditor
+            productId={newProduct.id}
+            price={newProduct.price}
+            isFood={newProduct.kind === 'food'}
+            onCancel={() => setNewFor(null)}
+            onSaved={(m) => {
+              setToast(m);
+              setNewFor(null);
+            }}
+          />
+        </SidePanel>
+      )}
+      <Toast message={toast} onDone={() => setToast(null)} />
     </>
   );
 }
 
-function RecipePanel({ recipe, name, price, cost, margin, onClose }: { recipe: Recipe; name: string; price: number; cost: number; margin: number; onClose: () => void }) {
+function RecipePanel({
+  recipe,
+  name,
+  price,
+  cost,
+  margin,
+  onClose,
+  onSaved,
+}: {
+  recipe: Recipe;
+  name: string;
+  price: number;
+  cost: number;
+  margin: number;
+  onClose: () => void;
+  onSaved: (m: string) => void;
+}) {
   const { ingredients } = useInventory();
+  const products = useProductMap();
+  const [editing, setEditing] = useState(false);
   const map = new Map(ingredients.map((i) => [i.id, i]));
   const facts = [
     { k: 'Giá bán', v: formatVnd(price) },
@@ -120,53 +180,85 @@ function RecipePanel({ recipe, name, price, cost, margin, onClose }: { recipe: R
     { k: 'Lãi gộp', v: `${margin}%` },
   ];
   return (
-    <SidePanel open title={name} onClose={onClose}>
-      <dl className="grid grid-cols-2 border border-roast/20">
-        {facts.map((f, k) => (
-          <div key={f.k} className={`px-3 py-2.5 ${k % 2 ? 'border-l border-roast/20' : ''} ${k > 1 ? 'border-t border-roast/20' : ''}`}>
-            <dt className="font-label text-[11px] uppercase tracking-wider text-roast/55">{f.k}</dt>
-            <dd className={`mt-0.5 font-semibold ${num}`}>{f.v}</dd>
+    <SidePanel
+      open
+      wide={editing}
+      title={editing ? `Sửa công thức: ${name}` : name}
+      onClose={onClose}
+      footer={
+        !editing && (
+          <div className="flex gap-2">
+            <button type="button" onClick={() => setEditing(true)} className={btnSolid}>
+              Sửa công thức
+            </button>
+            <Link href={`/quan-ly/thuc-don?sua=${recipe.productId}`} className={btnLine}>
+              Sửa món
+            </Link>
           </div>
-        ))}
-      </dl>
-      <h3 className="mt-6 font-label text-xs font-semibold uppercase tracking-wider text-roast/60">Định lượng {recipe.size === 'M' ? 'cho 1 ly size M' : `cho ${recipe.size}`}</h3>
-      <table className="mt-2 w-full text-sm">
-        <thead>
-          <tr>
-            <th className={th}>Nguyên liệu</th>
-            <th className={`${th} text-right`}>Lượng</th>
-            <th className={`${th} text-right`}>Thành tiền</th>
-          </tr>
-        </thead>
-        <tbody>
-          {recipe.lines.map((l) => {
-            const ing = map.get(l.ingredientId);
-            if (!ing) return null;
-            const st = stateOf(ing);
-            return (
-              <tr key={l.ingredientId} className="border-t border-roast/10">
-                <td className="px-4 py-2.5">
-                  <Link href={`/quan-ly/nguyen-lieu?xem=${ing.id}`} className="hover:underline">
-                    {ing.name}
-                  </Link>
-                  {st !== 'ok' && (
-                    <span className="ml-2 align-middle">
-                      <StockBadge state={st} />
-                    </span>
-                  )}
-                </td>
-                <td className={`px-4 py-2.5 text-right ${num}`}>
-                  {l.amount.toLocaleString('vi-VN')} {ing.sub}
-                </td>
-                <td className={`px-4 py-2.5 text-right text-roast/70 ${num}`}>{formatVnd((l.amount / ing.per) * ing.cost)}</td>
+        )
+      }
+    >
+      {editing ? (
+        <RecipeEditor
+          productId={recipe.productId}
+          price={price}
+          isFood={products.get(recipe.productId)?.kind === 'food'}
+          onCancel={() => setEditing(false)}
+          onSaved={(m) => {
+            onSaved(m);
+            setEditing(false);
+          }}
+        />
+      ) : (
+        <>
+          <dl className="grid grid-cols-2 border border-roast/20">
+            {facts.map((f, k) => (
+              <div key={f.k} className={`px-3 py-2.5 ${k % 2 ? 'border-l border-roast/20' : ''} ${k > 1 ? 'border-t border-roast/20' : ''}`}>
+                <dt className="font-label text-[11px] uppercase tracking-wider text-roast/55">{f.k}</dt>
+                <dd className={`mt-0.5 font-semibold ${num}`}>{f.v}</dd>
+              </div>
+            ))}
+          </dl>
+          <h3 className="mt-6 font-label text-xs font-semibold uppercase tracking-wider text-roast/60">Định lượng {recipe.size === 'M' ? 'cho 1 ly size M' : `cho ${recipe.size}`}</h3>
+          <table className="mt-2 w-full text-sm">
+            <thead>
+              <tr>
+                <th className={th}>Nguyên liệu</th>
+                <th className={`${th} text-right`}>Lượng</th>
+                <th className={`${th} text-right`}>Thành tiền</th>
               </tr>
-            );
-          })}
-        </tbody>
-      </table>
-      <p className="mt-2 flex justify-between border-t border-roast px-4 pt-3 font-semibold">
-        Tổng giá vốn <span className={num}>{formatVnd(cost)}</span>
-      </p>
+            </thead>
+            <tbody>
+              {recipe.lines.map((l) => {
+                const ing = map.get(l.ingredientId);
+                if (!ing) return null;
+                const st = stateOf(ing);
+                return (
+                  <tr key={l.ingredientId} className="border-t border-roast/10">
+                    <td className="px-4 py-2.5">
+                      <Link href={`/quan-ly/nguyen-lieu?xem=${ing.id}`} className="hover:underline">
+                        {ing.name}
+                      </Link>
+                      {st !== 'ok' && (
+                        <span className="ml-2 align-middle">
+                          <StockBadge state={st} />
+                        </span>
+                      )}
+                    </td>
+                    <td className={`px-4 py-2.5 text-right ${num}`}>
+                      {l.amount.toLocaleString('vi-VN')} {ing.sub}
+                    </td>
+                    <td className={`px-4 py-2.5 text-right text-roast/70 ${num}`}>{formatVnd((l.amount / ing.per) * ing.cost)}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+          <p className="mt-2 flex justify-between border-t border-roast px-4 pt-3 font-semibold">
+            Tổng giá vốn <span className={num}>{formatVnd(cost)}</span>
+          </p>
+        </>
+      )}
     </SidePanel>
   );
 }

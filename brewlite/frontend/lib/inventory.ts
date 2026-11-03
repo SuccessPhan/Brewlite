@@ -169,6 +169,8 @@ interface InventoryState {
   /** Áp kết quả kiểm kho: { id: số đếm thực tế } */
   applyCount: (counts: Record<string, number>, note: string) => number;
   saveIngredient: (i: Ingredient) => void;
+  /** Lưu công thức của một món (thay toàn bộ dòng định lượng) */
+  saveRecipe: (r: Recipe) => void;
 }
 
 const round = (n: number) => Math.round(n * 1000) / 1000;
@@ -228,6 +230,8 @@ export const useInventory = create<InventoryState>()((set, get) => ({
     });
     return changed;
   },
+
+  saveRecipe: (r) => set((s) => ({ recipes: s.recipes.some((x) => x.productId === r.productId) ? s.recipes.map((x) => (x.productId === r.productId ? r : x)) : [...s.recipes, r] })),
 
   saveIngredient: (ing) =>
     set((s) => ({ ingredients: s.ingredients.some((i) => i.id === ing.id) ? s.ingredients.map((i) => (i.id === ing.id ? ing : i)) : [...s.ingredients, ing] })),

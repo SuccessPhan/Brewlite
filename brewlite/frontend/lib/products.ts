@@ -18,7 +18,8 @@ export function useAllProducts() {
     staleTime: 30_000,
   });
   const edits = useStorefront((s) => s.products);
-  const data = useMemo(() => query.data?.map((p) => applyEdit(p, edits[p.id])), [query.data, edits]);
+  const added = useStorefront((s) => s.added);
+  const data = useMemo(() => query.data && [...query.data, ...added].map((p) => applyEdit(p, edits[p.id])), [query.data, added, edits]);
   return { ...query, data };
 }
 

@@ -34,7 +34,7 @@ export default function ProductCard({ product, ranges = [], index = 0 }: Props) 
         <span className={product.tag === 'hot' ? 'text-gold' : product.tag === 'new' ? 'text-leaf' : 'text-roast/50'}>
           {product.tag === 'hot' ? 'Bán chạy' : product.tag === 'new' ? 'Món mới' : ''}
         </span>
-        <span className="text-roast/60">★ {product.rating.toFixed(1).replace('.', ',')}</span>
+        {product.rating > 0 && <span className="text-roast/60">★ {product.rating.toFixed(1).replace('.', ',')}</span>}
       </div>
       <div className="relative mt-2 aspect-square overflow-hidden border border-roast bg-cream p-1.5">
         <div className="h-full w-full overflow-hidden bg-cream">
