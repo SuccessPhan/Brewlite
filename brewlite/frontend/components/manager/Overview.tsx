@@ -341,7 +341,7 @@ const LEVEL: Record<Level, { label: string; cls: string }> = {
 
 /** Cột "Cần xử lý": gom việc từ thực đơn, kho, mã giảm giá, phản hồi; việc gấp lên đầu */
 function TodoPanel() {
-  const { ingredients, receipts, recipes } = useInventory();
+  const { ingredients, recipes } = useInventory();
   const { data: products = [] } = useAllProducts();
   const { vouchers, content, feedback: fbState } = useStorefront();
   const { data: feedback = [] } = useFeedbackList();
@@ -362,8 +362,6 @@ function TodoPanel() {
   running.filter((v) => v.usageLimit && v.usedCount / v.usageLimit >= 0.8).forEach((v) => todos.push({ level: 'soon', title: `Mã ${v.code} còn ${(v.usageLimit ?? 0) - v.usedCount} lượt`, href: `/quan-ly/ma-giam-gia?sua=${v.code}` }));
   const low = ingredients.filter((i) => stateOf(i) === 'low');
   if (low.length) todos.push({ level: 'soon', title: `${low.length} nguyên liệu sắp hết`, href: '/quan-ly/nguyen-lieu?loc=can-nhap' });
-  const drafts = receipts.filter((r) => r.status === 'draft');
-  if (drafts.length) todos.push({ level: 'later', title: `${drafts.length} phiếu nhập chờ hàng về`, href: '/quan-ly/nhap-kho' });
 
   return (
     <section aria-labelledby="todo-title" className="border-2 border-roast">

@@ -24,7 +24,6 @@ export const MANAGER_GROUPS: { title: string; items: ManagerSection[] }[] = [
       { href: '/quan-ly/nhap-kho', label: 'Nhập kho', keywords: ['phieu nhap', 'mua hang'] },
       { href: '/quan-ly/kiem-kho', label: 'Kiểm kho', keywords: ['dem', 'kiem ke'] },
       { href: '/quan-ly/cong-thuc', label: 'Công thức', keywords: ['dinh luong', 'gia von', 'recipe'] },
-      { href: '/quan-ly/nha-cung-cap', label: 'Nhà cung cấp', keywords: ['ncc', 'supplier', 'dai ly'] },
     ],
   },
 ];

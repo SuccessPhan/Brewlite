@@ -66,7 +66,7 @@ export default function FeedbackInbox() {
         <label className="relative min-w-[14rem] flex-1">
           <span className="sr-only">Tìm phản hồi</span>
           <SearchIcon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-roast/50" />
-          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Tìm theo tên khách, nội dung, email, mã đơn…" className={`${input} pl-9`} />
+          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Tìm thư góp ý" className={`${input} pl-9`} />
         </label>
         <select value={topic} onChange={(e) => setTopic(e.target.value)} className={select} aria-label="Chủ đề">
           <option value="all">Mọi chủ đề</option>

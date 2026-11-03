@@ -1,6 +1,6 @@
 'use client';
 
-// TÌM NHANH TOÀN KHU QUẢN LÝ (Ctrl+K hoặc /): món, mã giảm giá, nguyên liệu, nhà cung cấp, phản hồi, các mục và thao tác.
+// TÌM NHANH TOÀN KHU QUẢN LÝ (Ctrl+K hoặc /): món, mã giảm giá, nguyên liệu, phản hồi, các mục và thao tác.
 // Dùng cùng bộ tìm của trang khách: gõ không dấu, chữ cái đầu ("cpsd"), tên gọi khác ("cf").
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from 'react';
@@ -25,13 +25,13 @@ interface Hit {
 }
 
 const ACTIONS = [
-  { title: 'Tạo phiếu nhập kho', href: '/quan-ly/nhap-kho?tao=1', keywords: ['nhap hang', 'mua'] },
+  { title: 'Nhập kho', href: '/quan-ly/nhap-kho', keywords: ['nhap hang', 'mua', 'phieu nhap'] },
   { title: 'Tạo mã giảm giá mới', href: '/quan-ly/ma-giam-gia?tao=1', keywords: ['voucher', 'khuyen mai'] },
   { title: 'Kiểm kho cuối ca', href: '/quan-ly/kiem-kho', keywords: ['dem hang'] },
   { title: 'Bật dải thông báo trên web', href: '/quan-ly/noi-dung', keywords: ['banner', 'thong bao'] },
   { title: 'Ẩn món khỏi thực đơn', href: '/quan-ly/thuc-don', keywords: ['tat mon', 'het hang'] },
 ];
-const GROUP_ORDER = ['Thao tác', 'Mục', 'Món', 'Mã giảm giá', 'Nguyên liệu', 'Nhà cung cấp', 'Phản hồi'];
+const GROUP_ORDER = ['Thao tác', 'Mục', 'Món', 'Mã giảm giá', 'Nguyên liệu', 'Phản hồi'];
 
 export default function QuickSearch() {
   const [open, setOpen] = useState(false);
@@ -58,8 +58,7 @@ export default function QuickSearch() {
         aria-label="Tìm nhanh"
       >
         <SearchIcon className="h-4 w-4 shrink-0" />
-        <span className="flex-1 truncate text-left">Tìm nhanh…</span>
-        <kbd className="hidden shrink-0 border border-roast/30 px-1 font-mono text-[10px] sm:inline">Ctrl K</kbd>
+        <span className="flex-1 truncate text-left">Tìm kiếm</span>
       </button>
       {open && <Palette onClose={() => setOpen(false)} />}
     </>
@@ -73,7 +72,7 @@ function Palette({ onClose }: { onClose: () => void }) {
   const [active, setActive] = useState(0);
   const { data: products = [] } = useAllProducts();
   const vouchers = useStorefront((s) => s.vouchers);
-  const { ingredients, suppliers } = useInventory();
+  const { ingredients } = useInventory();
   const { data: feedback = [] } = useFeedbackList();
 
   useEffect(() => {
@@ -107,7 +106,6 @@ function Palette({ onClose }: { onClose: () => void }) {
     );
     vouchers.forEach((v) => add('Mã giảm giá', v.code, `${v.title} · ${VOUCHER_STATE_LABEL[voucherState(v)]}`, `/quan-ly/ma-giam-gia?sua=${v.code}`, [v.title]));
     ingredients.forEach((i) => add('Nguyên liệu', i.name, `${qtyText(i.stock, i.unit)} · ${STATE_LABEL[stateOf(i)]}`, `/quan-ly/nguyen-lieu?xem=${i.id}`));
-    suppliers.forEach((s) => add('Nhà cung cấp', s.name, s.phone, '/quan-ly/nha-cung-cap', [s.note]));
     feedback.forEach((f) => add('Phản hồi', f.name, `${TOPIC_LABEL[f.topic] ?? f.topic} · ${f.message.slice(0, 50)}`, `/quan-ly/phan-hoi?xem=${f.id}`, [f.message, f.orderCode ?? '']));
     // Mỗi nhóm tối đa 5 kết quả, nhóm có kết quả khớp tốt nhất lên trước
     const byGroup = new Map<string, Hit[]>();
@@ -117,7 +115,7 @@ function Palette({ onClose }: { onClose: () => void }) {
       byGroup.set(h.group, g);
     }
     return [...byGroup.entries()].sort((a, b) => b[1][0].score - a[1][0].score || GROUP_ORDER.indexOf(a[0]) - GROUP_ORDER.indexOf(b[0])).flatMap(([, g]) => g);
-  }, [q, products, vouchers, ingredients, suppliers, feedback]);
+  }, [q, products, vouchers, ingredients, feedback]);
 
   useEffect(() => setActive(0), [q]);
 
@@ -148,16 +146,15 @@ function Palette({ onClose }: { onClose: () => void }) {
             value={q}
             onChange={(e) => setQ(e.target.value)}
             onKeyDown={onKey}
-            placeholder="Gõ tên món, mã, nguyên liệu, khách… (không dấu cũng được)"
+            placeholder="Tìm món, mã giảm giá, nguyên liệu, thư góp ý"
             className="h-14 flex-1 bg-transparent font-serif text-lg focus:outline-none"
             role="combobox"
             aria-expanded="true"
             aria-controls="qs-list"
           />
-          <kbd className="border border-roast/40 px-1.5 font-mono text-[10px] text-roast/60">Esc</kbd>
         </div>
         <ul id="qs-list" role="listbox" className="max-h-[60vh] overflow-y-auto py-2">
-          {hits.length === 0 && <li className="px-4 py-8 text-center text-roast/60">Không thấy “{q}”. Thử gõ chữ cái đầu, ví dụ “cpsd” cho Cà phê sữa đá.</li>}
+          {hits.length === 0 && <li className="px-4 py-8 text-center text-roast/60">Không tìm thấy “{q}”.</li>}
           {hits.map((h, i) => (
             <li key={`${h.group}-${h.href}-${h.title}`} role="option" aria-selected={i === active}>
               {(i === 0 || hits[i - 1].group !== h.group) && <p className="kicker px-4 pb-1 pt-3 first:pt-1">{h.group}</p>}
@@ -175,11 +172,6 @@ function Palette({ onClose }: { onClose: () => void }) {
             </li>
           ))}
         </ul>
-        <p className="flex gap-4 border-t border-roast/30 px-4 py-2 font-mono text-[10px] text-roast/55">
-          <span>↑↓ chọn</span>
-          <span>Enter mở</span>
-          <span>Esc đóng</span>
-        </p>
       </div>
     </div>,
     document.body,

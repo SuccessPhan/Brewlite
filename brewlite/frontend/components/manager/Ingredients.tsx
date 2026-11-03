@@ -1,37 +1,33 @@
 'use client';
 
-// DANH SÁCH NGUYÊN LIỆU: tìm, lọc theo nhóm và trạng thái; bấm một dòng mở khung chi tiết (lịch sử, món dùng, điều chỉnh tồn)
+// NGUYÊN LIỆU: ô số liệu bấm để lọc, bảng gọn có chia trang; bấm một dòng mở khung chi tiết
+// (tồn, giá vốn, món đang dùng, lịch sử) để nhập thêm, điều chỉnh tồn hoặc sửa thông tin.
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { formatDateTime, formatVnd } from '@/lib/format';
-import { matchText } from '@/lib/search';
 import { GROUPS, MOVE_LABEL, qtyText, stateOf, suggestQty, useInventory, type GroupId, type Ingredient, type StockState } from '@/lib/inventory';
 import { useProductMap } from '@/lib/products';
+import { matchText } from '@/lib/search';
 import Modal from '@/components/ui/Modal';
 import Toast from '@/components/ui/Toast';
 import { SearchIcon } from '@/components/ui/Icons';
-import { FieldLabel, PageHead, SidePanel, StateText, StockBar, btnInk, btnLine, btnSolid, input, select } from './ui';
+import { FieldLabel, FilterTile, PageHead, Pager, Panel, SidePanel, StockBadge, StockBar, btnInk, btnLine, btnSolid, input, num, searchInput, td, th, toolSelect, tr } from './ui';
 
-type StateFilter = 'all' | 'need' | StockState;
-const STATE_FILTERS: { id: StateFilter; label: string }[] = [
-  { id: 'all', label: 'Tất cả' },
-  { id: 'need', label: 'Cần nhập' },
-  { id: 'out', label: 'Hết hàng' },
-  { id: 'ok', label: 'Đủ dùng' },
-];
-type Sort = 'state' | 'name' | 'value';
-
+type Filter = 'all' | 'need' | 'out';
+const PAGE = 10;
 const fold = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/g, 'd').toLowerCase();
+const groupName = (id: GroupId) => GROUPS.find((g) => g.id === id)?.name ?? id;
+const RANK: Record<StockState, number> = { out: 0, low: 1, ok: 2 };
 
 export default function Ingredients() {
   const params = useSearchParams();
   const router = useRouter();
-  const { ingredients, suppliers } = useInventory();
+  const { ingredients } = useInventory();
   const [q, setQ] = useState('');
   const [group, setGroup] = useState<GroupId | 'all'>('all');
-  const [state, setState] = useState<StateFilter>(params.get('loc') === 'can-nhap' ? 'need' : 'all');
-  const [sort, setSort] = useState<Sort>('state');
+  const [filter, setFilter] = useState<Filter>(params.get('loc') === 'can-nhap' ? 'need' : 'all');
+  const [page, setPage] = useState(0);
   const [openId, setOpenId] = useState<string | null>(params.get('xem'));
   const [editing, setEditing] = useState<Ingredient | 'new' | null>(null);
   const [toast, setToast] = useState<string | null>(null);
@@ -41,134 +37,132 @@ export default function Ingredients() {
     const id = params.get('xem');
     if (id) setOpenId(id);
   }, [params]);
-
-  const supplierName = (id: string) => suppliers.find((s) => s.id === id)?.name ?? '—';
-  const rank: Record<StockState, number> = { out: 0, low: 1, ok: 2 };
-
-  const list = useMemo(() => {
-    const term = fold(q.trim());
-    return ingredients
-      .filter((i) => (group === 'all' || i.group === group) && (!term || matchText(i.name, q) !== null || fold(i.name).includes(term)))
-      .filter((i) => {
-        const st = stateOf(i);
-        return state === 'all' || (state === 'need' ? st !== 'ok' : st === state);
-      })
-      .sort((a, b) =>
-        sort === 'name' ? a.name.localeCompare(b.name, 'vi') : sort === 'value' ? b.stock * b.cost - a.stock * a.cost : rank[stateOf(a)] - rank[stateOf(b)] || a.name.localeCompare(b.name, 'vi'),
-      );
-  }, [ingredients, q, group, state, sort]);
+  useEffect(() => setPage(0), [q, group, filter]);
 
   const counts = useMemo(() => {
-    const c: Record<StateFilter, number> = { all: ingredients.length, need: 0, out: 0, low: 0, ok: 0 };
+    let need = 0;
+    let out = 0;
     for (const i of ingredients) {
       const st = stateOf(i);
-      c[st]++;
-      if (st !== 'ok') c.need++;
+      if (st !== 'ok') need++;
+      if (st === 'out') out++;
     }
-    return c;
+    return { all: ingredients.length, need, out, value: ingredients.reduce((n, i) => n + i.stock * i.cost, 0) };
   }, [ingredients]);
 
-  const open = ingredients.find((i) => i.id === openId) ?? null;
+  const list = useMemo(() => {
+    const term = q.trim();
+    return ingredients
+      .filter((i) => group === 'all' || i.group === group)
+      .filter((i) => filter === 'all' || (filter === 'need' ? stateOf(i) !== 'ok' : stateOf(i) === 'out'))
+      .filter((i) => !term || matchText(i.name, term) !== null || fold(i.name).includes(fold(term)))
+      .sort((a, b) => RANK[stateOf(a)] - RANK[stateOf(b)] || a.name.localeCompare(b.name, 'vi'));
+  }, [ingredients, q, group, filter]);
+  const rows = list.slice(page * PAGE, page * PAGE + PAGE);
+  const opened = ingredients.find((i) => i.id === openId) ?? null;
 
   return (
     <>
       <PageHead
-        kicker="Sổ kho"
         title="Nguyên liệu"
-        lead="Mỗi nguyên liệu có mức tối thiểu; tồn xuống tới mức này là cần nhập thêm."
         actions={
-          <button type="button" onClick={() => setEditing('new')} className={btnSolid}>
-            + Thêm nguyên liệu
-          </button>
+          <>
+            <Link href="/quan-ly/nhap-kho" className={btnLine}>
+              Nhập kho
+            </Link>
+            <button type="button" onClick={() => setEditing('new')} className={btnSolid}>
+              + Thêm nguyên liệu
+            </button>
+          </>
         }
       />
 
-      {/* Bộ lọc */}
-      <div className="mt-5 flex flex-wrap items-center gap-3">
-        <label className="relative min-w-[14rem] flex-1">
-          <span className="sr-only">Tìm nguyên liệu</span>
-          <SearchIcon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-roast/50" />
-          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Tìm nguyên liệu, gõ không dấu cũng được" className={`${input} pl-9`} />
-        </label>
-        <select value={group} onChange={(e) => setGroup(e.target.value as GroupId | 'all')} className={select} aria-label="Nhóm">
-          <option value="all">Mọi nhóm</option>
-          {GROUPS.map((g) => (
-            <option key={g.id} value={g.id}>
-              {g.name}
-            </option>
-          ))}
-        </select>
-        <select value={sort} onChange={(e) => setSort(e.target.value as Sort)} className={select} aria-label="Sắp xếp">
-          <option value="state">Cần chú ý trước</option>
-          <option value="name">Theo tên A–Z</option>
-          <option value="value">Giá trị tồn cao trước</option>
-        </select>
-      </div>
-      <div className="no-scrollbar -mx-4 mt-4 flex gap-1 overflow-x-auto border-b-2 border-roast px-4" role="tablist" aria-label="Lọc theo trạng thái">
-        {STATE_FILTERS.map((f) => (
-          <button
-            key={f.id}
-            type="button"
-            role="tab"
-            aria-selected={state === f.id}
-            onClick={() => setState(f.id)}
-            className={`-mb-0.5 shrink-0 border-b-[3px] px-3 py-2 font-label text-sm font-semibold uppercase tracking-wider ${state === f.id ? 'border-gold' : 'border-transparent text-roast/55 hover:text-roast'}`}
-          >
-            {f.label}
-            <span className={`ml-1.5 font-mono text-xs ${f.id === 'need' && counts.need ? 'text-chili' : 'opacity-70'}`}>{counts[f.id]}</span>
-          </button>
-        ))}
+      <div className="mt-5 grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <FilterTile label="Tất cả" value={counts.all} active={filter === 'all'} onClick={() => setFilter('all')} />
+        <FilterTile label="Cần nhập" value={counts.need} tone={counts.need ? 'text-amber-700' : ''} active={filter === 'need'} onClick={() => setFilter('need')} />
+        <FilterTile label="Hết hàng" value={counts.out} tone={counts.out ? 'text-chili' : ''} active={filter === 'out'} onClick={() => setFilter('out')} />
+        <FilterTile label="Giá trị tồn kho" value={formatVnd(counts.value)} />
       </div>
 
-      {/* Bảng */}
-      {list.length === 0 ? (
-        <p className="py-12 text-center text-roast/60">Không có nguyên liệu nào khớp bộ lọc.</p>
-      ) : (
-        <div className="overflow-x-auto">
-          <table className="w-full min-w-[44rem] text-sm">
-            <thead>
-              <tr className="border-b border-roast text-left font-label text-[11px] uppercase tracking-wider text-roast/60">
-                <th className="py-2.5 pr-3 font-semibold">Nguyên liệu</th>
-                <th className="px-3 py-2.5 font-semibold">Tồn kho</th>
-                <th className="px-3 py-2.5 font-semibold">Trạng thái</th>
-                <th className="px-3 py-2.5 text-right font-semibold">Giá vốn</th>
-                <th className="px-3 py-2.5 text-right font-semibold">Giá trị tồn</th>
-                <th className="py-2.5 pl-3 font-semibold">Nhà cung cấp</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-dotted divide-roast/40">
-              {list.map((i) => (
-                <tr key={i.id} onClick={() => setOpenId(i.id)} className="cursor-pointer hover:bg-roast/5">
-                  <td className="py-3 pr-3">
-                    <button type="button" className="plain-btn text-left font-semibold hover:underline" onClick={() => setOpenId(i.id)}>
-                      {i.name}
-                    </button>
-                    <span className="block text-xs text-roast/55">{GROUPS.find((g) => g.id === i.group)?.name}</span>
-                  </td>
-                  <td className="w-44 px-3 py-3">
-                    <span className="font-mono">{qtyText(i.stock, i.unit)}</span>
-                    <span className="ml-1 font-mono text-xs text-roast/50">/ {i.min}</span>
-                    <span className="mt-1.5 block">
-                      <StockBar stock={i.stock} min={i.min} />
-                    </span>
-                  </td>
-                  <td className="px-3 py-3">
-                    <StateText state={stateOf(i)} />
-                  </td>
-                  <td className="px-3 py-3 text-right font-mono text-xs">
-                    {formatVnd(i.cost)}/{i.unit}
-                  </td>
-                  <td className="px-3 py-3 text-right font-mono">{formatVnd(Math.round(i.stock * i.cost))}</td>
-                  <td className="py-3 pl-3 text-roast/75">{supplierName(i.supplierId)}</td>
-                </tr>
+      <Panel
+        className="mt-4"
+        toolbar={
+          <>
+            <label className="relative min-w-[12rem] flex-1">
+              <span className="sr-only">Tìm nguyên liệu</span>
+              <SearchIcon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-roast/45" />
+              <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Tìm nguyên liệu" className={searchInput} />
+            </label>
+            <select value={group} onChange={(e) => setGroup(e.target.value as GroupId | 'all')} className={toolSelect} aria-label="Nhóm">
+              <option value="all">Tất cả nhóm</option>
+              {GROUPS.map((g) => (
+                <option key={g.id} value={g.id}>
+                  {g.name}
+                </option>
               ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+            </select>
+          </>
+        }
+        footer={<Pager page={page} size={PAGE} total={list.length} onPage={setPage} />}
+      >
+        {rows.length === 0 ? (
+          <p className="px-4 py-10 text-center text-sm text-roast/60">Không có nguyên liệu nào khớp bộ lọc.</p>
+        ) : (
+          <div className="relative overflow-x-auto">
+            <table className="w-full min-w-[42rem] text-sm">
+              <thead>
+                <tr>
+                  <th className={th}>Nguyên liệu</th>
+                  <th className={th}>Tồn kho</th>
+                  <th className={th}>Trạng thái</th>
+                  <th className={`${th} text-right`}>Giá vốn</th>
+                  <th className={`${th} text-right`}>Giá trị tồn</th>
+                  <th className={th}>
+                    <span className="sr-only">Thao tác</span>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {rows.map((i) => {
+                  const st = stateOf(i);
+                  return (
+                    <tr key={i.id} onClick={() => setOpenId(i.id)} className={`${tr} cursor-pointer`}>
+                      <td className={td}>
+                        <span className="block font-semibold">{i.name}</span>
+                        <span className="block text-xs text-roast/55">{groupName(i.group)}</span>
+                      </td>
+                      <td className={`${td} w-48`}>
+                        <span className={`text-sm ${num}`}>
+                          {qtyText(i.stock, i.unit)} <span className="text-roast/45">/ {qtyText(i.min, i.unit)}</span>
+                        </span>
+                        <span className="mt-1.5 block w-36">
+                          <StockBar stock={i.stock} min={i.min} />
+                        </span>
+                      </td>
+                      <td className={td}>
+                        <StockBadge state={st} />
+                      </td>
+                      <td className={`${td} text-right text-roast/75 ${num}`}>
+                        {formatVnd(i.cost)}
+                        <span className="text-roast/45">/{i.unit}</span>
+                      </td>
+                      <td className={`${td} text-right ${num}`}>{formatVnd(i.stock * i.cost)}</td>
+                      <td className={`${td} w-24 text-right`} onClick={(e) => e.stopPropagation()}>
+                        <Link href={`/quan-ly/nhap-kho?nl=${i.id}`} className="inline-flex h-8 items-center border border-roast/30 px-3 font-label text-[11px] font-semibold uppercase tracking-wider hover:border-roast hover:bg-roast hover:text-cream">
+                          Nhập
+                        </Link>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </Panel>
 
       <IngredientPanel
-        ingredient={open}
+        ingredient={opened}
         onClose={() => {
           setOpenId(null);
           if (params.get('xem')) router.replace('/quan-ly/nguyen-lieu');
@@ -184,7 +178,7 @@ export default function Ingredients() {
 
 /** Khung chi tiết một nguyên liệu */
 function IngredientPanel({ ingredient: i, onClose, onEdit, onToast }: { ingredient: Ingredient | null; onClose: () => void; onEdit: (i: Ingredient) => void; onToast: (m: string) => void }) {
-  const { suppliers, movements, recipes, adjust } = useInventory();
+  const { movements, recipes, adjust } = useInventory();
   const products = useProductMap();
   const [mode, setMode] = useState<'view' | 'adjust'>('view');
   const [newStock, setNewStock] = useState('');
@@ -199,8 +193,7 @@ function IngredientPanel({ ingredient: i, onClose, onEdit, onToast }: { ingredie
 
   if (!i) return null;
   const st = stateOf(i);
-  const supplier = suppliers.find((s) => s.id === i.supplierId);
-  const history = movements.filter((m) => m.ingredientId === i.id).slice(0, 12);
+  const history = movements.filter((m) => m.ingredientId === i.id).slice(0, 10);
   const usedIn = recipes.filter((r) => r.lines.some((l) => l.ingredientId === i.id));
   const parsed = Number(newStock.replace(',', '.'));
   const validAdjust = newStock.trim() !== '' && Number.isFinite(parsed) && parsed >= 0 && note.trim().length >= 3;
@@ -213,6 +206,13 @@ function IngredientPanel({ ingredient: i, onClose, onEdit, onToast }: { ingredie
     setMode('view');
   }
 
+  const facts = [
+    { k: 'Tồn kho', v: qtyText(i.stock, i.unit) },
+    { k: 'Mức tối thiểu', v: qtyText(i.min, i.unit) },
+    { k: 'Giá vốn', v: `${formatVnd(i.cost)}/${i.unit}` },
+    { k: 'Giá trị tồn', v: formatVnd(i.stock * i.cost) },
+  ];
+
   return (
     <SidePanel
       open
@@ -221,7 +221,7 @@ function IngredientPanel({ ingredient: i, onClose, onEdit, onToast }: { ingredie
       footer={
         mode === 'view' ? (
           <div className="flex flex-wrap gap-2">
-            <Link href={`/quan-ly/nhap-kho?tao=1&ncc=${i.supplierId}&nl=${i.id}`} className={btnSolid}>
+            <Link href={`/quan-ly/nhap-kho?nl=${i.id}`} className={btnSolid}>
               Nhập thêm
             </Link>
             <button type="button" onClick={() => setMode('adjust')} className={btnLine}>
@@ -234,48 +234,28 @@ function IngredientPanel({ ingredient: i, onClose, onEdit, onToast }: { ingredie
         ) : null
       }
     >
-      <div className="flex items-end justify-between gap-3">
-        <div>
-          <p className="font-label text-[11px] uppercase tracking-wider text-roast/60">Tồn hiện tại</p>
-          <p className="font-display text-4xl font-black tabular-nums leading-none">{qtyText(i.stock, i.unit)}</p>
-        </div>
-        <StateText state={st} />
+      <div className="flex items-center justify-between gap-3">
+        <span className="text-sm text-roast/60">
+          {groupName(i.group)} · 1 {i.unit} = {i.per.toLocaleString('vi-VN')} {i.sub}
+        </span>
+        <StockBadge state={st} />
       </div>
+      <dl className="mt-3 grid grid-cols-2 border border-roast/20">
+        {facts.map((f, k) => (
+          <div key={f.k} className={`px-3 py-2.5 ${k % 2 ? 'border-l border-roast/20' : ''} ${k > 1 ? 'border-t border-roast/20' : ''}`}>
+            <dt className="font-label text-[11px] uppercase tracking-wider text-roast/55">{f.k}</dt>
+            <dd className={`mt-0.5 font-semibold ${num}`}>{f.v}</dd>
+          </div>
+        ))}
+      </dl>
       <div className="mt-3">
         <StockBar stock={i.stock} min={i.min} />
-        <p className="mt-1 text-xs text-roast/60">
-          Mức tối thiểu {qtyText(i.min, i.unit)}
-          {st !== 'ok' && ` · nên nhập thêm ${qtyText(suggestQty(i), i.unit)}`}
-        </p>
+        {st !== 'ok' && <p className="mt-1.5 text-xs text-amber-700">Nên nhập thêm khoảng {qtyText(suggestQty(i), i.unit)}.</p>}
       </div>
 
-      <dl className="mt-5 grid grid-cols-2 gap-x-4 gap-y-3 border-y border-roast py-4 text-sm">
-        <div>
-          <dt className="font-label text-[11px] uppercase tracking-wider text-roast/60">Giá vốn</dt>
-          <dd className="font-mono">
-            {formatVnd(i.cost)}/{i.unit}
-          </dd>
-        </div>
-        <div>
-          <dt className="font-label text-[11px] uppercase tracking-wider text-roast/60">Giá trị tồn</dt>
-          <dd className="font-mono">{formatVnd(Math.round(i.stock * i.cost))}</dd>
-        </div>
-        <div>
-          <dt className="font-label text-[11px] uppercase tracking-wider text-roast/60">Đơn vị dùng</dt>
-          <dd>
-            1 {i.unit} = {i.per.toLocaleString('vi-VN')} {i.sub}
-          </dd>
-        </div>
-        <div>
-          <dt className="font-label text-[11px] uppercase tracking-wider text-roast/60">Nhà cung cấp</dt>
-          <dd>{supplier?.name ?? '—'}</dd>
-          {supplier && <dd className="text-xs text-roast/60">{supplier.phone}</dd>}
-        </div>
-      </dl>
-
       {mode === 'adjust' && (
-        <form onSubmit={submitAdjust} className="mt-5 space-y-3 border-2 border-roast p-4">
-          <p className="font-display text-lg font-bold">Điều chỉnh tồn kho</p>
+        <form onSubmit={submitAdjust} className="mt-5 space-y-3 border border-roast/30 bg-foam p-4">
+          <p className="font-semibold">Điều chỉnh tồn kho</p>
           <FieldLabel
             label={`Tồn mới (${i.unit})`}
             hint={newStock.trim() !== '' && Number.isFinite(parsed) ? `Chênh lệch ${parsed - i.stock >= 0 ? '+' : ''}${qtyText(Math.round((parsed - i.stock) * 1000) / 1000, i.unit)}` : undefined}
@@ -288,7 +268,7 @@ function IngredientPanel({ ingredient: i, onClose, onEdit, onToast }: { ingredie
               <option value="adjust">Điều chỉnh khác (đếm lại, nhập sai...)</option>
             </select>
           </FieldLabel>
-          <FieldLabel label="Ghi chú" hint="Bắt buộc, để sau này tra lại được">
+          <FieldLabel label="Ghi chú">
             <input value={note} onChange={(e) => setNote(e.target.value)} placeholder="Ví dụ: 2 hộp sữa phồng nắp" className={input} />
           </FieldLabel>
           <div className="flex gap-2">
@@ -302,7 +282,7 @@ function IngredientPanel({ ingredient: i, onClose, onEdit, onToast }: { ingredie
         </form>
       )}
 
-      <h3 className="kicker mt-6">Dùng trong món</h3>
+      <h3 className="mt-6 font-label text-xs font-semibold uppercase tracking-wider text-roast/60">Dùng trong món</h3>
       {usedIn.length === 0 ? (
         <p className="mt-1 text-sm text-roast/60">Chưa có công thức nào dùng nguyên liệu này.</p>
       ) : (
@@ -310,12 +290,10 @@ function IngredientPanel({ ingredient: i, onClose, onEdit, onToast }: { ingredie
           {usedIn.map((r) => {
             const amount = r.lines.find((l) => l.ingredientId === i.id)?.amount ?? 0;
             return (
-              <li key={r.productId} className="flex justify-between gap-3 border-b border-dotted border-roast/40 py-1.5">
-                <span>
-                  {products.get(r.productId)?.name ?? r.productId} <span className="text-roast/50">({r.size})</span>
-                </span>
-                <span className="font-mono text-xs">
-                  {amount.toLocaleString('vi-VN')} {i.sub}/ly
+              <li key={r.productId} className="flex justify-between gap-3 border-b border-roast/10 py-2">
+                <span>{products.get(r.productId)?.name ?? r.productId}</span>
+                <span className={`text-roast/65 ${num}`}>
+                  {amount.toLocaleString('vi-VN')} {i.sub}/{r.size === 'M' ? 'ly' : 'cái'}
                 </span>
               </li>
             );
@@ -323,26 +301,26 @@ function IngredientPanel({ ingredient: i, onClose, onEdit, onToast }: { ingredie
         </ul>
       )}
 
-      <h3 className="kicker mt-6">Lịch sử nhập xuất</h3>
+      <h3 className="mt-6 font-label text-xs font-semibold uppercase tracking-wider text-roast/60">Lịch sử nhập xuất</h3>
       {history.length === 0 ? (
         <p className="mt-1 text-sm text-roast/60">Chưa có ghi nhận nào.</p>
       ) : (
         <ol className="mt-1 text-sm">
           {history.map((m) => (
-            <li key={m.id} className="border-b border-dotted border-roast/40 py-2">
-              <div className="flex items-baseline justify-between gap-3">
-                <span className="font-semibold">
+            <li key={m.id} className="flex items-start justify-between gap-3 border-b border-roast/10 py-2">
+              <span className="min-w-0">
+                <span className="block font-semibold">
                   {MOVE_LABEL[m.kind]}
-                  {m.ref && <span className="ml-1 font-mono text-xs text-roast/60">{m.ref}</span>}
+                  {m.ref && <span className="ml-1.5 text-xs font-normal text-roast/55">{m.ref}</span>}
                 </span>
-                <span className={`font-mono ${m.qty >= 0 ? 'text-leaf' : 'text-chili'}`}>
-                  {m.qty >= 0 ? '+' : '−'}
-                  {qtyText(Math.abs(m.qty), i.unit)}
+                <span className="block truncate text-xs text-roast/55">
+                  {formatDateTime(m.at)} · {m.note}
                 </span>
-              </div>
-              <p className="text-xs text-roast/60">
-                {formatDateTime(m.at)} · {m.note}
-              </p>
+              </span>
+              <span className={`shrink-0 font-semibold ${num} ${m.qty >= 0 ? 'text-leaf' : 'text-chili'}`}>
+                {m.qty >= 0 ? '+' : '−'}
+                {qtyText(Math.abs(m.qty), i.unit)}
+              </span>
             </li>
           ))}
         </ol>
@@ -353,8 +331,8 @@ function IngredientPanel({ ingredient: i, onClose, onEdit, onToast }: { ingredie
 
 /** Thêm / sửa thông tin nguyên liệu (không sửa số tồn ở đây; tồn chỉ đổi qua nhập kho, điều chỉnh, kiểm kho) */
 function IngredientForm({ value, onClose, onSaved }: { value: Ingredient | 'new' | null; onClose: () => void; onSaved: (name: string) => void }) {
-  const { suppliers, saveIngredient, ingredients } = useInventory();
-  const empty: Ingredient = { id: '', name: '', group: 'ca-phe', unit: 'kg', sub: 'g', per: 1000, stock: 0, min: 1, cost: 0, supplierId: suppliers[0]?.id ?? '' };
+  const { saveIngredient, ingredients } = useInventory();
+  const empty: Ingredient = { id: '', name: '', group: 'ca-phe', unit: 'kg', sub: 'g', per: 1000, stock: 0, min: 1, cost: 0 };
   const [f, setF] = useState<Ingredient>(empty);
   const [error, setError] = useState<string | null>(null);
 
@@ -390,29 +368,18 @@ function IngredientForm({ value, onClose, onSaved }: { value: Ingredient | 'new'
       </h2>
       <form onSubmit={submit} className="mt-4 grid gap-3 sm:grid-cols-2">
         {error && (
-          <p role="alert" className="border-2 border-chili px-3 py-2 text-sm text-chili sm:col-span-2">
+          <p role="alert" className="border border-chili px-3 py-2 text-sm text-chili sm:col-span-2">
             {error}
           </p>
         )}
-        <div className="sm:col-span-2">
-          <FieldLabel label="Tên nguyên liệu">
-            <input value={f.name} onChange={(e) => set('name', e.target.value)} className={input} />
-          </FieldLabel>
-        </div>
+        <FieldLabel label="Tên nguyên liệu">
+          <input value={f.name} onChange={(e) => set('name', e.target.value)} className={input} />
+        </FieldLabel>
         <FieldLabel label="Nhóm">
           <select value={f.group} onChange={(e) => set('group', e.target.value as GroupId)} className={input}>
             {GROUPS.map((g) => (
               <option key={g.id} value={g.id}>
                 {g.name}
-              </option>
-            ))}
-          </select>
-        </FieldLabel>
-        <FieldLabel label="Nhà cung cấp">
-          <select value={f.supplierId} onChange={(e) => set('supplierId', e.target.value)} className={input}>
-            {suppliers.map((s) => (
-              <option key={s.id} value={s.id}>
-                {s.name}
               </option>
             ))}
           </select>
@@ -429,10 +396,9 @@ function IngredientForm({ value, onClose, onSaved }: { value: Ingredient | 'new'
         <FieldLabel label={`Mức tối thiểu (${f.unit || 'đơn vị'})`}>
           <input type="number" min={0} step="any" value={f.min} onChange={(e) => set('min', Number(e.target.value))} className={input} />
         </FieldLabel>
-        <FieldLabel label={`Giá vốn (đ/${f.unit || 'đơn vị'})`} hint={isNew ? 'Lần nhập kho sau sẽ tự tính lại giá vốn bình quân' : undefined}>
+        <FieldLabel label={`Giá vốn (đ/${f.unit || 'đơn vị'})`}>
           <input type="number" min={0} step={100} value={f.cost} onChange={(e) => set('cost', Number(e.target.value))} className={input} />
         </FieldLabel>
-        {!isNew && <p className="text-xs text-roast/60 sm:col-span-2">Số tồn không sửa ở đây. Muốn đổi tồn, dùng Nhập kho, Điều chỉnh tồn hoặc Kiểm kho để có lịch sử.</p>}
         <div className="flex gap-2 sm:col-span-2">
           <button type="submit" className={btnSolid}>
             {isNew ? 'Thêm nguyên liệu' : 'Lưu thay đổi'}

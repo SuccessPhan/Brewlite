@@ -111,7 +111,7 @@ export default function MenuManager() {
         <label className="relative min-w-[14rem] flex-1">
           <span className="sr-only">Tìm món</span>
           <SearchIcon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-roast/50" />
-          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Tìm món: gõ không dấu, chữ đầu (cpsd, bx)…" className={`${input} pl-9 font-serif normal-case tracking-normal`} />
+          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Tìm món" className={`${input} pl-9 font-serif normal-case tracking-normal`} />
         </label>
         <select value={cat} onChange={(e) => setCat(e.target.value as CategoryId | 'all')} className={select} aria-label="Nhóm món">
           <option value="all">Mọi nhóm</option>

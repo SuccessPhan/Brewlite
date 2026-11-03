@@ -14,11 +14,11 @@ export const input = 'h-10 w-full border-2 border-roast/30 bg-cream px-3 text-sm
 /** Ô chọn gọn theo nội dung, dùng trong hàng bộ lọc */
 export const select = 'h-10 border-2 border-roast/30 bg-cream px-3 text-sm focus:border-roast focus:outline-none';
 
-export function PageHead({ kicker, title, lead, actions }: { kicker: string; title: string; lead?: string; actions?: ReactNode }) {
+export function PageHead({ kicker, title, lead, actions }: { kicker?: string; title: string; lead?: string; actions?: ReactNode }) {
   return (
     <div className="flex flex-wrap items-end justify-between gap-4 border-b-2 border-roast pb-4">
       <div>
-        <p className="kicker">{kicker}</p>
+        {kicker && <p className="kicker">{kicker}</p>}
         <h1 className="mt-1 text-3xl font-black leading-tight sm:text-4xl">{title}</h1>
         {lead && <p className="mt-1 max-w-2xl text-sm text-roast/70">{lead}</p>}
       </div>
@@ -136,3 +136,82 @@ export function Chip({ tone = 'ink', children }: { tone?: 'ink' | 'ok' | 'warn' 
 }
 
 export const textarea = 'w-full border-2 border-roast/30 bg-cream px-3 py-2 text-sm leading-relaxed focus:border-roast focus:outline-none';
+
+// ----- Khung bảng dữ liệu dùng chung cho các trang kho -----
+
+/** Số trong bảng: chữ thường, các chữ số cùng bề rộng để cột thẳng hàng */
+export const num = 'whitespace-nowrap [font-variant-numeric:tabular-nums]';
+
+/** Khung chứa bảng: viền mảnh, thanh công cụ phía trên, chân bảng phía dưới */
+export function Panel({ toolbar, footer, children, className = '' }: { toolbar?: ReactNode; footer?: ReactNode; children: ReactNode; className?: string }) {
+  return (
+    <section className={`border border-roast/25 bg-foam ${className}`}>
+      {toolbar && <div className="flex flex-wrap items-center gap-2 border-b border-roast/15 p-3">{toolbar}</div>}
+      {children}
+      {footer && <div className="border-t border-roast/15 px-4 py-3">{footer}</div>}
+    </section>
+  );
+}
+
+/** Lớp chữ cho bảng: đầu bảng nền nhạt, hàng cao đều, rê chuột sáng nhẹ */
+export const th = 'bg-roast/[0.04] px-4 py-2.5 text-left font-label text-[11px] font-semibold uppercase tracking-wider text-roast/55';
+export const td = 'px-4 py-3 align-middle';
+export const tr = 'border-t border-roast/10 hover:bg-roast/[0.03]';
+
+/** Nhãn trạng thái tồn có nền nhạt */
+export function StockBadge({ state }: { state: StockState }) {
+  const cls = { ok: 'bg-leaf/10 text-leaf', low: 'bg-amber-600/10 text-amber-700', out: 'bg-chili/10 text-chili' }[state];
+  return (
+    <span className={`inline-flex items-center gap-1.5 whitespace-nowrap px-2 py-0.5 text-xs font-semibold ${cls}`}>
+      <span className={`keep-round h-1.5 w-1.5 rounded-full ${state === 'ok' ? 'bg-leaf' : state === 'low' ? 'bg-amber-600' : 'bg-chili'}`} aria-hidden="true" />
+      {STATE_LABEL[state]}
+    </span>
+  );
+}
+
+/** Chia trang: "1–10 trên 25" và hai nút trước/sau */
+export function Pager({ page, size, total, onPage }: { page: number; size: number; total: number; onPage: (p: number) => void }) {
+  const pages = Math.max(1, Math.ceil(total / size));
+  if (total <= size) return <p className="text-xs text-roast/55">{total} dòng</p>;
+  const from = page * size + 1;
+  const to = Math.min(total, from + size - 1);
+  const btn = 'grid h-8 w-8 place-items-center border border-roast/25 text-sm hover:bg-roast/5 disabled:opacity-35';
+  return (
+    <div className="flex items-center justify-between gap-3 text-xs text-roast/60">
+      <span className={num}>
+        {from}–{to} trên {total}
+      </span>
+      <span className="flex items-center gap-1">
+        <button type="button" className={btn} onClick={() => onPage(page - 1)} disabled={page === 0} aria-label="Trang trước">
+          ‹
+        </button>
+        <span className={`px-2 ${num}`}>
+          {page + 1}/{pages}
+        </span>
+        <button type="button" className={btn} onClick={() => onPage(page + 1)} disabled={page >= pages - 1} aria-label="Trang sau">
+          ›
+        </button>
+      </span>
+    </div>
+  );
+}
+
+/** Ô số liệu bấm được để lọc bảng */
+export function FilterTile({ label, value, active, tone = '', onClick }: { label: string; value: ReactNode; active?: boolean; tone?: string; onClick?: () => void }) {
+  const body = (
+    <>
+      <span className="block font-label text-[11px] font-semibold uppercase tracking-wider text-roast/55">{label}</span>
+      <span className={`mt-1 block text-2xl font-bold leading-none ${num} ${tone}`}>{value}</span>
+    </>
+  );
+  if (!onClick) return <div className="border border-roast/25 bg-foam px-4 py-3">{body}</div>;
+  return (
+    <button type="button" onClick={onClick} aria-pressed={active} className={`plain-btn border bg-foam px-4 py-3 text-left transition-colors ${active ? 'border-roast ring-1 ring-roast' : 'border-roast/25 hover:border-roast/60'}`}>
+      {body}
+    </button>
+  );
+}
+
+/** Ô tìm trong thanh công cụ */
+export const searchInput = 'h-9 w-full border border-roast/25 bg-cream pl-9 pr-3 text-sm focus:border-roast focus:outline-none';
+export const toolSelect = 'h-9 border border-roast/25 bg-cream px-2.5 text-sm focus:border-roast focus:outline-none';
