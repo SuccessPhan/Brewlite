@@ -57,6 +57,7 @@ export class AuthService {
       id: user.id,
       fullName: user.fullName,
       email: user.email,
+      role: user.role,
       createdAt: user.createdAt,
       points: user.loyaltyPoints,
       pointsLog: user.loyaltyLogs.map((l) => ({ id: l.id, at: l.createdAt, label: l.reason, delta: l.delta })),

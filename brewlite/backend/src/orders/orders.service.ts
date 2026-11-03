@@ -20,6 +20,9 @@ export class StockVersionConflict extends Error {
 }
 
 const ORDER_INCLUDE = { items: true } satisfies Prisma.OrderInclude;
+/** Quầy chỉ cần tên khách để gọi món, không trả email hay điểm của khách */
+const STAFF_ORDER_INCLUDE = { items: true, user: { select: { fullName: true } } } satisfies Prisma.OrderInclude;
+const QUEUE_STATUSES: OrderStatus[] = ['PAID', 'PREPARING', 'READY'];
 const newOrderId = () => `BL${String(Math.floor(Math.random() * 1_000_000)).padStart(6, '0')}`;
 
 @Injectable()
@@ -173,12 +176,23 @@ export class OrdersService {
   }
 
   /** Quầy chuyển đơn sang bước tiếp theo: PAID → PREPARING → READY → COMPLETED (dùng khi demo) */
-  async advance(userId: string, id: string) {
-    const order = await this.findOne(userId, id);
+  /** Hàng đợi của quầy: đơn đã thanh toán, đang pha, chờ lấy; đơn cũ nhất lên trước */
+  findQueue() {
+    return this.prisma.order.findMany({
+      where: { status: { in: QUEUE_STATUSES } },
+      include: STAFF_ORDER_INCLUDE,
+      orderBy: { createdAt: 'asc' },
+    });
+  }
+
+  /** Nhân viên quầy chuyển đơn sang bước tiếp theo (PAID → PREPARING → READY → COMPLETED) */
+  async advance(id: string) {
+    const order = await this.prisma.order.findUnique({ where: { id } });
+    if (!order) throw new NotFoundException(`Không tìm thấy đơn ${id}`);
     const next = HAPPY_PATH_NEXT[order.status as OrderStatus];
     if (!next) throw new ConflictException(`Đơn đang ở trạng thái ${order.status}, không có bước tiếp theo`);
     await moveOrderStatus(this.prisma, order.id, order.status as OrderStatus, next);
-    return this.findOne(userId, id);
+    return this.prisma.order.findUniqueOrThrow({ where: { id }, include: STAFF_ORDER_INCLUDE });
   }
 }
 

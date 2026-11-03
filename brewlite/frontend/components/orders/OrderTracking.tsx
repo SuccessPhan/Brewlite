@@ -54,7 +54,7 @@ export default function OrderTracking({ orderId }: { orderId: string }) {
   }, [order, load]);
 
   /** Gọi API đổi trạng thái; máy trạng thái ở backend sẽ từ chối nếu không hợp lệ */
-  async function act(path: 'advance' | 'cancel') {
+  async function act(path: 'cancel') {
     if (!order) return;
     setBusy(true);
     setActionError(null);
@@ -212,11 +212,6 @@ export default function OrderTracking({ orderId }: { orderId: string }) {
           {unpaid && (
             <button type="button" disabled={busy} onClick={() => act('cancel')} className="rounded-full border-2 border-chili/40 px-4 py-2 text-sm font-semibold text-chili hover:bg-chili/10 disabled:opacity-60">
               Huỷ đơn
-            </button>
-          )}
-          {['PAID', 'PREPARING', 'READY'].includes(order.status) && (
-            <button type="button" disabled={busy} onClick={() => act('advance')} className="text-xs text-roast/50 underline underline-offset-4 disabled:opacity-60">
-              Demo (vai trò quầy): chuyển sang bước tiếp theo
             </button>
           )}
         </div>

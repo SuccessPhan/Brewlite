@@ -33,11 +33,4 @@ export class OrdersController {
   cancel(@CurrentUser() user: User, @Param('id') id: string) {
     return this.orders.cancel(user.id, id);
   }
-
-  /** Demo vai trò quầy: chuyển sang bước tiếp theo theo máy trạng thái */
-  @Post(':id/advance')
-  @HttpCode(200)
-  advance(@CurrentUser() user: User, @Param('id') id: string) {
-    return this.orders.advance(user.id, id);
-  }
 }

@@ -8,6 +8,12 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+/// CUSTOMER: khách đặt món. STAFF: nhân viên quầy, chuyển đơn đã thanh toán qua các bước pha chế
+enum Role {
+  CUSTOMER
+  STAFF
+}
+
 enum OrderStatus {
   PENDING
   PAID
@@ -53,6 +59,7 @@ model User {
   fullName      String
   passwordHash  String
   loyaltyPoints Int                  @default(0)
+  role          Role                 @default(CUSTOMER)
   createdAt     DateTime             @default(now())
   orders        Order[]
   loyaltyLogs   LoyaltyTransaction[]

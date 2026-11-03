@@ -64,7 +64,13 @@ async function main() {
       },
     });
   }
-  console.log(`Đã nạp ${PRODUCTS.length} món, ${TOPPINGS.length} topping, ${VOUCHERS.length} mã giảm giá, tài khoản demo@brewlite.vn / Brewlite123`);
+  // Tài khoản nhân viên quầy chỉ tạo bằng seed; đăng ký trên web luôn là khách (CUSTOMER)
+  await prisma.user.upsert({
+    where: { email: 'staff@brewlite.vn' },
+    update: { role: 'STAFF' },
+    create: { email: 'staff@brewlite.vn', fullName: 'Nhân viên quầy', passwordHash: await bcrypt.hash('Brewlite123', 10), role: 'STAFF' },
+  });
+  console.log(`Đã nạp ${PRODUCTS.length} món, ${TOPPINGS.length} topping, ${VOUCHERS.length} mã giảm giá, tài khoản demo@brewlite.vn và staff@brewlite.vn (mật khẩu Brewlite123)`);
 }
 
 main()

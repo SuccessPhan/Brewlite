@@ -95,7 +95,7 @@ npm install
 npm run dev                                  # http://localhost:3000
 ```
 
-**Tài khoản demo:** `demo@brewlite.vn` / `Brewlite123` (có sẵn 1.250 điểm).
+**Tài khoản demo:** khách `demo@brewlite.vn` / `Brewlite123` (có sẵn 1.250 điểm); nhân viên quầy `staff@brewlite.vn` / `Brewlite123`.
 
 **Thẻ test VNPay sandbox** (VNPay công bố cho môi trường thử, không phải thẻ thật):
 
@@ -119,7 +119,7 @@ Trên trang VNPay chọn **Thẻ nội địa và tài khoản ngân hàng → N
 8. Thử sửa `vnp_ResponseCode` trên thanh địa chỉ rồi tải lại trang → báo **chữ ký không hợp lệ**, không ghi nhận (chống giả mạo kết quả).
 9. Mở **Lịch sử giao dịch** (menu tài khoản hoặc trang Tài khoản → Xem tất cả): thấy 2 giao dịch (thất bại, thành công). Bấm vào giao dịch thành công: chi tiết + nhật ký trao đổi với VNPay; bấm **Kiểm tra lại với VNPay** để hỏi lại VNPay (API `querydr`).
 10. Đăng nhập trang quản trị merchant sandbox https://sandbox.vnpayment.vn/merchantv2/ (tài khoản trong email đăng ký) → **Tra cứu giao dịch**: thấy đúng giao dịch, đúng số tiền và mã `vnp_TxnRef` như trong BrewLite.
-11. **Theo dõi đơn hàng**: mã đơn để đọc tại quầy An Dương Vương; bấm *Demo (vai trò quầy)* để đi PAID → PREPARING → READY → COMPLETED.
+11. **Theo dõi đơn hàng**: mã đơn để đọc tại quầy An Dương Vương. Mở cửa sổ ẩn danh, đăng nhập `staff@brewlite.vn`, vào menu tài khoản → **Quầy pha chế**: bấm *Bắt đầu pha* → *Pha xong* → *Đã giao khách*; trang theo dõi đơn của khách tự cập nhật PAID → PREPARING → READY → COMPLETED.
 12. Mở terminal chạy `npm run test` và `npm run test:int` trong `backend` để chứng minh Task 10 và việc xử lý kết quả VNPay.
 
 ## Product Backlog → mã nguồn
@@ -207,7 +207,6 @@ npm run test:int    # integration test trên PostgreSQL thật (cần docker com
 | GET | `/orders/me` | Có | Lịch sử đơn |
 | GET | `/orders/:id` | Có | Chi tiết đơn |
 | POST | `/orders/:id/cancel` | Có | Huỷ đơn chưa thanh toán, hoàn kho |
-| POST | `/orders/:id/advance` | Có | Demo vai trò quầy: bước tiếp theo |
 | POST | `/payments` | Có | Bắt đầu thanh toán `{ orderId, method }`, header `Idempotency-Key` bắt buộc. VNPAY: trả `payUrl`; POINTS: trừ điểm ngay |
 | GET | `/payments/vnpay/status` | | Backend đã điền mã VNPay chưa |
 | GET | `/payments/vnpay/return?vnp_...` | Có | Trang kết quả gửi lại tham số VNPay: kiểm chữ ký, ghi nhận |
@@ -215,6 +214,8 @@ npm run test:int    # integration test trên PostgreSQL thật (cần docker com
 | GET | `/payments/me` | Có | Lịch sử giao dịch |
 | GET | `/payments/:id` | Có | Chi tiết giao dịch kèm nhật ký trao đổi với VNPay |
 | POST | `/payments/:id/query` | Có | Đối soát: hỏi lại VNPay (API `querydr`) |
+| GET | `/staff/orders` | Nhân viên | Hàng đợi của quầy: đơn PAID, PREPARING, READY |
+| POST | `/staff/orders/:id/advance` | Nhân viên | Chuyển đơn sang bước tiếp theo; khách gọi nhận 403 |
 
 ## Cấu trúc thư mục
 

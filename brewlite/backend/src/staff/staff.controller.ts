@@ -1,0 +1,26 @@
+import { Controller, Get, HttpCode, Param, Post, UseGuards } from '@nestjs/common';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { Roles } from '../auth/roles.decorator';
+import { RolesGuard } from '../auth/roles.guard';
+import { OrdersService } from '../orders/orders.service';
+
+/** API của quầy pha chế: chỉ tài khoản STAFF gọi được (khách gọi nhận 403) */
+@Controller('staff/orders')
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles('STAFF')
+export class StaffController {
+  constructor(private readonly orders: OrdersService) {}
+
+  /** GET /staff/orders: đơn đã thanh toán đang chờ quầy xử lý */
+  @Get()
+  queue() {
+    return this.orders.findQueue();
+  }
+
+  /** POST /staff/orders/:id/advance: chuyển đơn sang bước tiếp theo theo máy trạng thái */
+  @Post(':id/advance')
+  @HttpCode(200)
+  advance(@Param('id') id: string) {
+    return this.orders.advance(id);
+  }
+}

@@ -97,6 +97,11 @@ export interface Order {
   items: OrderItem[];
 }
 
+/** Đơn trong hàng đợi của quầy: kèm tên khách để gọi khi món xong */
+export interface StaffOrder extends Order {
+  user: { fullName: string };
+}
+
 /** PROCESSING: đã tạo link VNPay, chờ khách trả. NEEDS_REFUND: VNPay đã trừ tiền nhưng đơn đã trả bằng giao dịch khác / đã huỷ */
 export type PaymentStatus = 'PROCESSING' | 'SUCCEEDED' | 'FAILED' | 'NEEDS_REFUND';
 
@@ -186,10 +191,14 @@ export interface AppNotification {
   time: string;
 }
 
+/** CUSTOMER: khách đặt món. STAFF: nhân viên quầy */
+export type Role = 'CUSTOMER' | 'STAFF';
+
 export interface User {
   id: string;
   fullName: string;
   email: string;
+  role: Role;
   createdAt: string;
   points: number;
   pointsLog: PointsEntry[];
