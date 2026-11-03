@@ -1,11 +1,13 @@
-// Lược đồ CSDL BrewLite (PostgreSQL). Chạy `npm run db:push` để tạo bảng, `npm run seed` để nạp dữ liệu mẫu.
+// Lược đồ CSDL BrewLite (PostgreSQL). Chạy `npm run db:setup` để tạo bảng, rào CSDL và nạp dữ liệu mẫu.
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  // App chạy bằng tài khoản chỉ đọc/ghi dữ liệu; prisma db push dùng tài khoản chủ CSDL (src/db-harden.ts)
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 /// CUSTOMER: khách đặt món. STAFF: nhân viên quầy, chuyển đơn đã thanh toán qua các bước pha chế

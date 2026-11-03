@@ -1,4 +1,5 @@
 import { Body, Controller, Get, HttpCode, Post, UseGuards } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import type { User } from '@prisma/client';
 import { AuthService } from './auth.service';
 import { CurrentUser } from './current-user.decorator';
@@ -11,14 +12,16 @@ import { JwtAuthGuard } from './jwt-auth.guard';
 export class AuthController {
   constructor(private readonly auth: AuthService) {}
 
-  /** POST /auth/register: tạo tài khoản (bcrypt), trả token đăng nhập luôn */
+  /** POST /auth/register: tạo tài khoản (bcrypt), trả token đăng nhập luôn. Tối đa 5 lần/phút mỗi IP */
   @Post('register')
+  @Throttle({ default: { ttl: 60_000, limit: 5 } })
   register(@Body() dto: RegisterDto) {
     return this.auth.register(dto);
   }
 
-  /** POST /auth/login: trả JWT */
+  /** POST /auth/login: trả JWT. Tối đa 5 lần/phút mỗi IP để chống dò mật khẩu */
   @Post('login')
+  @Throttle({ default: { ttl: 60_000, limit: 5 } })
   @HttpCode(200)
   login(@Body() dto: LoginDto) {
     return this.auth.login(dto);

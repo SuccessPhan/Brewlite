@@ -1,9 +1,13 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
+import helmet from 'helmet';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  // Header bảo mật (chặn nhúng iframe, đoán kiểu file, lộ tên framework...)
+  app.use(helmet());
 
   // Cho phép frontend (khác cổng) gọi API
   app.enableCors({

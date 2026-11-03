@@ -74,7 +74,10 @@ Nhấp đúp vào `run-brewlite.bat`. Script sẽ tự động:
 
 ### Cách 2: Docker Compose (dùng khi bàn giao)
 
+Trước lần chạy đầu, thêm khoá ký token vào file `brewlite/.env` (cạnh `docker-compose.yml`); thiếu khoá thì container backend báo lỗi và dừng:
+
 ```bash
+node -e "console.log('JWT_SECRET=' + require('crypto').randomBytes(48).toString('base64url'))" >> .env
 docker compose up --build
 ```
 (hoặc nhấp đúp `run-docker.bat`). Mở http://localhost:3000. Tắt: `docker compose down` (thêm `-v` để xoá cả dữ liệu).
@@ -86,7 +89,7 @@ docker compose up -d db                      # PostgreSQL ở cổng 5433
 cd backend
 cp .env.example .env                         # Windows: copy .env.example .env, rồi điền VNP_TMN_CODE, VNP_HASH_SECRET
 npm install                                  # tự chạy prisma generate
-npm run db:setup                             # tạo bảng + nạp dữ liệu mẫu
+npm run db:setup                             # tạo bảng + rào CSDL + nạp dữ liệu mẫu
 npm run start:dev                            # http://localhost:3001/health
 
 cd ../frontend                               # cửa sổ terminal thứ hai
@@ -194,6 +197,32 @@ npm run test:int    # integration test trên PostgreSQL thật (cần docker com
 | Xử lý kết quả VNPay | `test/payments-vnpay.int-spec.ts` (VNPay giả lập bằng tham số ký đúng: thành công, khách huỷ rồi trả lại, sửa tham số → chữ ký sai 97, sai số tiền 04, mã lạ 01, trả 2 lần → cần hoàn tiền, đối soát querydr), `src/payments/vnpay/vnpay.util.spec.ts` (chữ ký so với giá trị tính độc lập bằng Python, giờ GMT+7) |
 | (c) đặt đồng thời không vượt tồn kho | `test/stock-concurrency.int-spec.ts` (kho 5, 12 khách đặt cùng lúc → đúng 5 đơn) |
 
+## Bảo mật
+
+| Lớp | Cách làm | Kiểm chứng |
+|---|---|---|
+| Mật khẩu | Băm bcrypt, không bao giờ trả `passwordHash` ra API; mật khẩu tối thiểu 8 ký tự, có chữ và số | `auth.service.ts` |
+| Đăng nhập | JWT ký bằng `JWT_SECRET`; khi chạy production, thiếu khoá, khoá dưới 32 ký tự hoặc khoá mẫu thì API không khởi động | `jwt.strategy.ts` |
+| Chống dò mật khẩu | Mỗi IP tối đa 5 lần/phút cho đăng nhập, đăng ký; 120 request/phút cho các API khác; vượt thì trả 429 | Thunder Client: bấm đăng nhập sai 6 lần |
+| Phân quyền | `RolesGuard`: API quầy chỉ cho STAFF (403); vai trò đọc lại từ CSDL mỗi request; đăng ký trên web không tự gán vai trò được | `roles.guard.spec.ts`, Thunder mục 6 |
+| Dữ liệu của ai người nấy xem | Mọi truy vấn đơn, giao dịch đều lọc theo người đăng nhập; đơn người khác trả 404 | Thunder mục 6 |
+| Dữ liệu đầu vào | `ValidationPipe` với `whitelist` + `forbidNonWhitelisted`: trường lạ (giá, vai trò) bị từ chối 400; giá do backend tính từ CSDL | Thunder mục 6 |
+| Thanh toán | Chữ ký HMAC-SHA512 của VNPay, kiểm số tiền, Idempotency-Key | `payments-vnpay.int-spec.ts` |
+| Header HTTP | `helmet` ở API; frontend chặn nhúng iframe, `nosniff`, `Referrer-Policy` | `curl -I http://localhost:3001/health` |
+| **CSDL: tài khoản riêng cho app** | App kết nối bằng `brewlite_app` (`DATABASE_URL`), chỉ được SELECT/INSERT/UPDATE/DELETE; tạo bảng dùng tài khoản chủ (`DIRECT_URL`). App bị tấn công cũng không DROP, TRUNCATE hay đổi cấu trúc bảng được | `test/db-security.int-spec.ts` |
+| **CSDL: ràng buộc CHECK** | CSDL tự từ chối tồn kho âm, điểm âm, tiền âm, số lượng ngoài 1–20 | `src/db-harden.ts`, `test/db-security.int-spec.ts` |
+| **CSDL: mạng** | PostgreSQL chỉ mở cổng cho `127.0.0.1`, máy khác trong mạng không kết nối thẳng được; truy vấn qua Prisma có tham số, không ghép chuỗi SQL | `docker-compose.yml` |
+| Bí mật | `JWT_SECRET`, `VNP_HASH_SECRET`, mật khẩu CSDL chỉ nằm trong `.env` (đã `.gitignore`) | |
+
+Còn lại cần làm khi đưa lên mạng thật: chạy sau HTTPS, đổi mật khẩu chủ CSDL (`DB_OWNER_PASSWORD`), cân nhắc chuyển token từ localStorage sang cookie `httpOnly`.
+
+## Gọi API bằng Thunder Client
+
+1. Cài extension **Thunder Client** trong VS Code, chạy backend (`run-brewlite.bat` hoặc `npm run start:dev`).
+2. Thunder Client → tab **Collections** → nút menu ☰ → **Import** → chọn `brewlite/thunder-client/thunder-collection_BrewLite.json`.
+3. Chạy từng request theo thứ tự thư mục 1 → 6, hoặc chuột phải collection → **Run All**. Đăng nhập xong token tự lưu vào biến `{{token}}`, `{{staffToken}}`; tạo đơn xong mã đơn lưu vào `{{orderId}}`. Mỗi request có sẵn test mã trạng thái mong đợi.
+4. Thư mục **6. Bảo mật** là các ca phải bị chặn (401, 403, 404, 400). Request đăng nhập sai bấm liên tục 6 lần trong 1 phút sẽ nhận 429.
+
 ## API
 
 | Phương thức | Đường dẫn | Đăng nhập | Việc |
@@ -247,8 +276,10 @@ brewlite/
 | File | Biến | Ý nghĩa |
 |---|---|---|
 | backend/.env | PORT | Cổng API (3001) |
-| backend/.env | DATABASE_URL | Chuỗi kết nối PostgreSQL |
-| backend/.env | JWT_SECRET | Khoá ký token, đổi khi triển khai thật |
+| backend/.env | DIRECT_URL | Kết nối bằng tài khoản chủ CSDL, chỉ dùng để tạo bảng và rào CSDL |
+| backend/.env | DATABASE_URL | Kết nối bằng tài khoản app `brewlite_app` (chỉ đọc/ghi dữ liệu); `db:harden` tự tạo tài khoản theo tên, mật khẩu ghi ở đây |
+| backend/.env, .env | JWT_SECRET | Khoá ký token, chuỗi ngẫu nhiên ≥ 32 ký tự (bắt buộc với Docker và production) |
+| .env | DB_OWNER_PASSWORD, DB_APP_PASSWORD | Mật khẩu 2 tài khoản CSDL khi chạy Docker (bỏ trống thì dùng mật khẩu mặc định cho máy cá nhân) |
 | backend/.env | FRONTEND_URL | Địa chỉ frontend được phép gọi API (CORS) |
 | backend/.env | VNP_TMN_CODE | Mã website VNPay sandbox (trong email đăng ký) |
 | backend/.env | VNP_HASH_SECRET | Chuỗi bí mật ký HMAC-SHA512, **không đưa lên GitHub** |
