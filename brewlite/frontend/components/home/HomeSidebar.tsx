@@ -76,7 +76,7 @@ function PromoBox() {
           Giảm tới 25.000đ cho mỗi đơn trả bằng thẻ ATM, thẻ quốc tế hoặc QR.
         </p>
 
-        <div className="relative mt-3 flex items-stretch border-2 border-dashed border-gold bg-[#f7f1e3]">
+        <div className="relative mt-3 flex items-stretch border-2 border-dashed border-gold bg-cream">
           <span className="flex flex-1 items-center px-3 font-mono text-lg font-bold tracking-widest text-gold">
             {PROMO_CODE}
           </span>
