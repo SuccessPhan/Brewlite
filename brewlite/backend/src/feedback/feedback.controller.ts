@@ -20,7 +20,7 @@ export class FeedbackController {
   /** GET /staff/feedback: nhân viên đọc góp ý mới nhất */
   @Get('staff/feedback')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('STAFF')
+  @Roles('STAFF', 'MANAGER')
   findLatest() {
     return this.feedback.findLatest();
   }

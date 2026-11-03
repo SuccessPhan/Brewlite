@@ -53,7 +53,13 @@ export default function AppHeader() {
     return () => window.removeEventListener(CART_BUMP_EVENT, onBump);
   }, []);
 
-  const links = user?.role === 'STAFF' ? [...NAV_LINKS, { href: '/staff', label: 'Quầy pha chế' }] : NAV_LINKS;
+  // Nhân viên thấy thêm Quầy pha chế; quản lý thấy Quản lý kho (trong đó có lối sang quầy)
+  const links =
+    user?.role === 'STAFF'
+      ? [...NAV_LINKS, { href: '/staff', label: 'Quầy pha chế' }]
+      : user?.role === 'MANAGER'
+        ? [...NAV_LINKS, { href: '/quan-ly', label: 'Quản lý kho' }]
+        : NAV_LINKS;
   const isActive = (href: string) => (href === '/' ? pathname === '/' : pathname.startsWith(href));
 
   return (

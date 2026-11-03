@@ -57,8 +57,13 @@ export default function UserMenu() {
               </p>
             </div>
             <nav className="mt-1 flex flex-col text-sm font-semibold">
-              {user.role === 'STAFF' && (
-                <Link href="/staff" onClick={() => setOpen(false)} className="flex items-center gap-3 rounded-xl bg-gold/15 px-3 py-2.5 hover:bg-gold/25">
+              {user.role === 'MANAGER' && (
+                <Link href="/quan-ly" onClick={() => setOpen(false)} className="flex items-center gap-3 rounded-xl bg-gold/15 px-3 py-2.5 hover:bg-gold/25">
+                  <ReceiptIcon /> Quản lý kho
+                </Link>
+              )}
+              {(user.role === 'STAFF' || user.role === 'MANAGER') && (
+                <Link href="/staff" onClick={() => setOpen(false)} className={`flex items-center gap-3 rounded-xl px-3 py-2.5 ${user.role === 'STAFF' ? 'bg-gold/15 hover:bg-gold/25' : 'hover:bg-cream'}`}>
                   <CupIcon /> Quầy pha chế
                 </Link>
               )}

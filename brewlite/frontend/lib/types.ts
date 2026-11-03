@@ -195,7 +195,7 @@ export interface AppNotification {
 }
 
 /** CUSTOMER: khách đặt món. STAFF: nhân viên quầy */
-export type Role = 'CUSTOMER' | 'STAFF';
+export type Role = 'CUSTOMER' | 'STAFF' | 'MANAGER';
 
 export interface User {
   id: string;

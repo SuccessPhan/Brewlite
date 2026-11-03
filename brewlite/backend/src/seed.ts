@@ -91,7 +91,12 @@ async function main() {
     update: { role: 'STAFF' },
     create: { email: 'staff@brewlite.vn', fullName: 'Nhân viên quầy', passwordHash: await bcrypt.hash('Brewlite123', 10), role: 'STAFF' },
   });
-  console.log(`Đã nạp ${PRODUCTS.length} món, ${TOPPINGS.length} topping, ${VOUCHERS.length} mã giảm giá, tài khoản demo@brewlite.vn và staff@brewlite.vn (mật khẩu Brewlite123)`);
+  await prisma.user.upsert({
+    where: { email: 'manager@brewlite.vn' },
+    update: { role: 'MANAGER' },
+    create: { email: 'manager@brewlite.vn', fullName: 'Quản lý cửa hàng', passwordHash: await bcrypt.hash('Brewlite123', 10), role: 'MANAGER' },
+  });
+  console.log(`Đã nạp ${PRODUCTS.length} món, ${TOPPINGS.length} topping, ${VOUCHERS.length} mã giảm giá, tài khoản demo@brewlite.vn, staff@brewlite.vn và manager@brewlite.vn (mật khẩu Brewlite123)`);
 }
 
 main()

@@ -4,10 +4,10 @@ import { Roles } from '../auth/roles.decorator';
 import { RolesGuard } from '../auth/roles.guard';
 import { OrdersService } from '../orders/orders.service';
 
-/** API của quầy pha chế: chỉ tài khoản STAFF gọi được (khách gọi nhận 403) */
+/** API của quầy pha chế: nhân viên quầy và quản lý gọi được (khách gọi nhận 403) */
 @Controller('staff/orders')
 @UseGuards(JwtAuthGuard, RolesGuard)
-@Roles('STAFF')
+@Roles('STAFF', 'MANAGER')
 export class StaffController {
   constructor(private readonly orders: OrdersService) {}
 

@@ -21,8 +21,9 @@ export default function BottomNav() {
   const { user } = useAuth();
   if (pathname.startsWith('/product') || pathname.startsWith('/checkout')) return null;
 
-  // Nhân viên: ô "Đơn hàng" đổi thành "Quầy" để vào hàng đợi pha chế trên điện thoại
-  const items = user?.role === 'STAFF' ? ITEMS.map((i) => (i.href === '/orders' ? { ...i, href: '/staff', label: 'Quầy' } : i)) : ITEMS;
+  // Nhân viên: ô "Đơn hàng" đổi thành "Quầy"; quản lý: đổi thành "Kho"
+  const swap = user?.role === 'STAFF' ? { href: '/staff', label: 'Quầy' } : user?.role === 'MANAGER' ? { href: '/quan-ly', label: 'Kho' } : null;
+  const items = swap ? ITEMS.map((i) => (i.href === '/orders' ? { ...i, ...swap } : i)) : ITEMS;
 
   return (
     <nav aria-label="Điều hướng chính" className="fixed inset-x-0 bottom-0 z-30 border-t-[3px] border-double border-roast bg-cream pb-[env(safe-area-inset-bottom)] md:hidden">

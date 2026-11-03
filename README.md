@@ -98,7 +98,7 @@ npm install
 npm run dev                                  # http://localhost:3000
 ```
 
-**Tài khoản demo:** khách `demo@brewlite.vn` / `Brewlite123` (có sẵn 1.250 điểm); nhân viên quầy `staff@brewlite.vn` / `Brewlite123`.
+**Tài khoản demo:** khách `demo@brewlite.vn` / `Brewlite123` (có sẵn 1.250 điểm); nhân viên quầy `staff@brewlite.vn` / `Brewlite123`; quản lý cửa hàng `manager@brewlite.vn` / `Brewlite123` (vào **Quản lý kho**: tổng quan, nguyên liệu, nhập kho, kiểm kho, công thức, nhà cung cấp; hiện chạy bằng dữ liệu kho mẫu trên trình duyệt, API kho làm sau).
 
 **Thẻ test VNPay sandbox** (VNPay công bố cho môi trường thử, không phải thẻ thật):
 
