@@ -3,6 +3,7 @@
 // GIỎ HÀNG NHANH: trượt ra từ bên phải khi bấm nút giỏ hàng, xem và sửa nhanh mà không rời trang đang xem
 import Link from 'next/link';
 import { useEffect } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
 import { createPortal } from 'react-dom';
 import { useAppStore } from '@/context/app-store';
 import { describeOptions, formatVnd } from '@/lib/format';
@@ -12,6 +13,8 @@ import QuantityStepper from '@/components/ui/QuantityStepper';
 import { CloseIcon, TrashIcon } from '@/components/ui/Icons';
 
 export default function CartDrawer({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const router = useRouter();
+  const pathname = usePathname();
   const { cart, cartCount, subtotal, setQuantity, removeFromCart } = useAppStore();
   const productMap = useProductMap();
 
@@ -89,7 +92,15 @@ export default function CartDrawer({ open, onClose }: { open: boolean; onClose: 
               <Link href="/checkout" onClick={onClose} className="mt-4 flex h-12 items-center justify-center bg-gold font-label text-base font-semibold uppercase tracking-wider text-foam hover:bg-gold-deep">
                 Thanh toán · {formatVnd(subtotal)}
               </Link>
-              <button type="button" onClick={onClose} className="mt-2 h-11 w-full border-2 border-roast text-sm font-semibold hover:bg-roast hover:text-cream">
+              {/* Đang ở trang khác thì đưa sang Thực đơn; đang ở Thực đơn rồi thì chỉ đóng giỏ để chọn tiếp */}
+              <button
+                type="button"
+                onClick={() => {
+                  onClose();
+                  if (pathname !== '/menu') router.push('/menu');
+                }}
+                className="mt-2 h-11 w-full border-2 border-roast text-sm font-semibold hover:bg-roast hover:text-cream"
+              >
                 Chọn thêm món
               </button>
             </div>
