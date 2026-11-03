@@ -75,12 +75,15 @@ async function main() {
     await prisma.user.create({
       data: {
         email: 'demo@brewlite.vn',
-        fullName: 'Khách Demo',
+        fullName: 'Nguyễn Minh Anh',
         passwordHash: await bcrypt.hash('Brewlite123', 10),
         loyaltyPoints: 1250,
         loyaltyLogs: { create: { delta: 1250, reason: 'Quà chào mừng thành viên mới' } },
       },
     });
+  } else if (demo.fullName === 'Khách Demo') {
+    // CSDL cũ: đổi tên mẫu cũ thành tên người thật, khách nhìn vào không thấy chữ "Demo"
+    await prisma.user.update({ where: { id: demo.id }, data: { fullName: 'Nguyễn Minh Anh' } });
   }
   // Tài khoản nhân viên quầy chỉ tạo bằng seed; đăng ký trên web luôn là khách (CUSTOMER)
   await prisma.user.upsert({

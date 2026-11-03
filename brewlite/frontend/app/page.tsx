@@ -36,24 +36,27 @@ export default function HomePage() {
               Xem mã ưu đãi
             </Link>
           </div>
+
+          {/* Ba bước đặt món, chia cột như một mục chuyên đề ngay dưới bài chính */}
+          <section className="mt-10 border-y-[3px] border-double border-roast py-6" aria-labelledby="how-title">
+            <h2 id="how-title" className="text-3xl font-black">
+              Đặt món chỉ ba bước
+            </h2>
+            <ol className="mt-5 grid gap-6 md:grid-cols-3 md:gap-0">
+              {STEPS.map((s, i) => (
+                <li key={s.n} className={`md:px-5 ${i > 0 ? 'md:border-l md:border-roast' : 'md:pl-0'}`}>
+                  <span className="font-display text-4xl font-black text-gold">{s.n}.</span>
+                  <h3 className="mt-1 text-xl font-bold">{s.title}</h3>
+                  <p className="mt-1 text-[15px] leading-relaxed text-roast/80">{s.text}</p>
+                </li>
+              ))}
+            </ol>
+          </section>
         </article>
 
         <HomeSidebar />
       </section>
 
-      {/* Ba bước đặt món, chia cột như một mục chuyên đề */}
-      <section className="mt-12 border-y-[3px] border-double border-roast py-6" aria-labelledby="how-title">
-        <h2 id="how-title" className="text-center text-3xl font-black">Đặt món chỉ ba bước</h2>
-        <ol className="mt-6 grid gap-6 md:grid-cols-3 md:gap-0">
-          {STEPS.map((s, i) => (
-            <li key={s.n} className={`md:px-6 ${i > 0 ? 'md:border-l md:border-roast' : ''}`}>
-              <span className="font-display text-4xl font-black text-gold">{s.n}.</span>
-              <h3 className="mt-1 text-xl font-bold">{s.title}</h3>
-              <p className="mt-1 text-[15px] leading-relaxed text-roast/80">{s.text}</p>
-            </li>
-          ))}
-        </ol>
-      </section>
 
       <div className="mt-12">
         <BestSellerRail />

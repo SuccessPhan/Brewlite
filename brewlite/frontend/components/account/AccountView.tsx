@@ -6,12 +6,12 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useAppStore } from '@/context/app-store';
 import { useAuth } from '@/context/auth-context';
-import { ApiError } from '@/lib/api';
+import { useRedeem } from '@/lib/redeem';
 import { REWARDS } from '@/lib/mock-data';
 import { formatDateTime, formatNumber, formatVnd } from '@/lib/format';
 import { statusLabel, tierOf } from '@/lib/pricing';
 import { useMyOrders } from '@/lib/use-orders';
-import type { Level, Order, SizeId, User } from '@/lib/types';
+import type { Level, Order, SizeId } from '@/lib/types';
 import { initialsOf } from '@/components/layout/UserMenu';
 import InvoiceModal from '@/components/orders/InvoiceModal';
 import RecentPayments from '@/components/payment/RecentPayments';
@@ -21,12 +21,12 @@ import { LogoutIcon } from '@/components/ui/Icons';
 
 export default function AccountView() {
   const router = useRouter();
-  const { user, request, setUser, logout } = useAuth();
+  const { user, logout } = useAuth();
   const { addManyToCart } = useAppStore();
   const { orders } = useMyOrders();
   const [invoice, setInvoice] = useState<Order | null>(null);
   const [toast, setToast] = useState<string | null>(null);
-  const [redeeming, setRedeeming] = useState<string | null>(null);
+  const { redeem: redeemReward, redeeming } = useRedeem();
 
   if (!user) return null;
 
@@ -50,16 +50,9 @@ export default function AccountView() {
     router.push('/checkout');
   }
 
-  async function redeem(rewardId: string, name: string) {
-    setRedeeming(rewardId);
-    try {
-      setUser(await request<User>('/auth/redeem', { method: 'POST', body: { rewardId } }));
-      setToast(`Đã đổi ${name}. Đưa mã thành viên cho nhân viên khi tới quầy.`);
-    } catch (err) {
-      setToast(err instanceof ApiError ? err.message : 'Chưa đổi được quà, thử lại sau.');
-    } finally {
-      setRedeeming(null);
-    }
+  async function redeem(rewardId: string) {
+    const error = await redeemReward(rewardId);
+    if (error) setToast(error);
   }
 
   return (
@@ -165,7 +158,7 @@ export default function AccountView() {
                   <button
                     type="button"
                     disabled={!enough || redeeming !== null}
-                    onClick={() => redeem(r.id, r.name)}
+                    onClick={() => redeem(r.id)}
                     className="shrink-0 rounded-full bg-gold px-4 py-2 text-sm font-bold text-roast enabled:hover:bg-gold-deep enabled:hover:text-foam disabled:cursor-not-allowed disabled:bg-roast/10 disabled:text-roast/40"
                   >
                     {redeeming === r.id ? 'Đang đổi…' : enough ? 'Đổi quà' : 'Chưa đủ điểm'}

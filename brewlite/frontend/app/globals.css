@@ -149,16 +149,10 @@ button { text-transform: uppercase; }
   --hole: 5px;
   --step: 14px;
   padding: 9px;
-  background: radial-gradient(circle at center, transparent var(--hole), var(--color-roast) calc(var(--hole) + 0.5px)) calc(var(--step) / -2) calc(var(--step) / -2) / var(--step) var(--step);
+  background: radial-gradient(circle at center, transparent var(--hole), var(--color-roast) calc(var(--hole) + 0.5px)) calc(var(--step) / -2) calc(var(--step) / -2) / var(--step) var(--step) round;
 }
 .postage-inner { background: var(--color-cream); outline: 2px solid var(--color-gold); outline-offset: -2px; }
-/* Dấu bưu điện tròn đóng chồng lên góc tem */
-.postmark {
-  border: 2px solid currentColor;
-  border-radius: 9999px;
-  box-shadow: inset 0 0 0 3px var(--color-cream), inset 0 0 0 4px currentColor;
-  transform: rotate(-14deg);
-}
+.postage-inner.postage-ink { outline-color: var(--color-roast); }
 
 /* Ảnh món trong thực đơn: in cùng một tông đen trắng ngả sépia, nền sáng hoà vào màu giấy,
    để ảnh chụp ở nhiều nơi khác nhau trông như cùng một bộ ảnh; rê chuột thì hiện màu */

@@ -8,6 +8,7 @@ import { ApiError } from '@/lib/api';
 import { AlertIcon } from '@/components/ui/Icons';
 import PasswordField from './PasswordField';
 import TextField from './TextField';
+import { SHOW_DEMO_HINTS } from '@/lib/demo';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -45,22 +46,24 @@ export default function LoginForm({ next }: { next: string }) {
       <h1 className="text-3xl font-extrabold tracking-tight">Chào mừng trở lại</h1>
       <p className="mt-2 text-roast/65">Đăng nhập để thanh toán, theo dõi đơn và tích điểm.</p>
 
-      <div className="mt-5 flex items-center justify-between gap-3 rounded-2xl border-2 border-dashed border-gold/50 bg-gold/10 px-4 py-3 text-sm">
-        <span>
-          Tài khoản demo: <b>demo@brewlite.vn</b> / <b>Brewlite123</b>
-        </span>
-        <button
-          type="button"
-          onClick={() => {
-            setEmail('demo@brewlite.vn');
-            setPassword('Brewlite123');
-            setServerError(null);
-          }}
-          className="shrink-0 font-semibold text-gold-deep underline underline-offset-4"
-        >
-          Điền sẵn
-        </button>
-      </div>
+      {SHOW_DEMO_HINTS && (
+        <div className="mt-5 flex items-center justify-between gap-3 rounded-2xl border-2 border-dashed border-gold/50 bg-gold/10 px-4 py-3 text-sm">
+          <span>
+            Tài khoản demo: <b>demo@brewlite.vn</b> / <b>Brewlite123</b>
+          </span>
+          <button
+            type="button"
+            onClick={() => {
+              setEmail('demo@brewlite.vn');
+              setPassword('Brewlite123');
+              setServerError(null);
+            }}
+            className="shrink-0 font-semibold text-gold-deep underline underline-offset-4"
+          >
+            Điền sẵn
+          </button>
+        </div>
+      )}
 
       <form onSubmit={onSubmit} noValidate className="mt-6 space-y-4">
         {serverError && (

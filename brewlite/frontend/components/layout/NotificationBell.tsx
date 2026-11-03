@@ -4,6 +4,7 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useAuth } from '@/context/auth-context';
 import { timeAgo, useMarkRead, useNotifications } from '@/lib/notifications';
 import type { AppNotification } from '@/lib/types';
@@ -114,12 +115,17 @@ export default function NotificationBell({ withLabel }: { withLabel?: boolean })
           </div>
       )}
 
-      <Toast
-        message={popup ? `${popup.title}. ${popup.body}` : null}
-        actionHref={popup?.orderId ? `/orders/${popup.orderId}` : undefined}
-        actionLabel={popup?.orderId ? 'Xem đơn' : undefined}
-        onDone={() => setPopup(null)}
-      />
+      {/* Phần đầu trang dính trên cùng nên dòng báo phải gắn thẳng vào body mới nằm đúng đáy màn hình */}
+      {popup &&
+        createPortal(
+          <Toast
+            message={`${popup.title}. ${popup.body}`}
+            actionHref={popup.orderId ? `/orders/${popup.orderId}` : undefined}
+            actionLabel={popup.orderId ? 'Xem đơn' : undefined}
+            onDone={() => setPopup(null)}
+          />,
+          document.body,
+        )}
     </div>
   );
 }

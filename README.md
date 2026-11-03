@@ -216,6 +216,10 @@ npm run test:int    # integration test trên PostgreSQL thật (cần docker com
 
 Còn lại cần làm khi đưa lên mạng thật: chạy sau HTTPS, đổi mật khẩu chủ CSDL (`DB_OWNER_PASSWORD`), cân nhắc chuyển token từ localStorage sang cookie `httpOnly`.
 
+### Gợi ý khi trình bày
+
+Tài khoản mẫu trên trang đăng nhập và thẻ thử VNPay ở bước thanh toán mặc định **ẩn**, khách thật không thấy. Khi demo, bật bằng `NEXT_PUBLIC_SHOW_DEMO_HINTS=1` trong `brewlite/frontend/.env.local` (chạy `npm run dev`) hoặc `SHOW_DEMO_HINTS=1` trong `brewlite/.env` (chạy Docker), rồi khởi động lại frontend.
+
 ## Gọi API bằng Thunder Client
 
 1. Cài extension **Thunder Client** trong VS Code, chạy backend (`run-brewlite.bat` hoặc `npm run start:dev`).

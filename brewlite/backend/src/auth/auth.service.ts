@@ -1,3 +1,4 @@
+import { randomBytes } from 'crypto';
 import { BadRequestException, ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import type { User } from '@prisma/client';
@@ -76,6 +77,11 @@ export class AuthService {
       });
       if (res.count === 0) throw new BadRequestException('Bạn chưa đủ điểm để đổi quà này');
       await tx.loyaltyTransaction.create({ data: { userId, delta: -reward.cost, reason: `Đổi quà: ${reward.name}` } });
+      // Mã quà gửi vào thông báo để khách đọc cho nhân viên ở quầy
+      const code = randomBytes(3).toString('hex').toUpperCase();
+      await tx.notification.create({
+        data: { userId, title: `Đã đổi quà: ${reward.name}`, body: `Mã quà của bạn là ${code}. Đọc mã này cho nhân viên ở quầy để nhận quà.` },
+      });
     });
     return this.profile(userId);
   }
