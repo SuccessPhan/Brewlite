@@ -40,15 +40,8 @@ const SECTIONS = [
 export default function PolicyPage() {
   return (
     <Article kicker="Văn bản" title="Chính sách và điều khoản" lead="Áp dụng cho mọi đơn đặt trên BrewLite.">
-      <nav aria-label="Mục lục chính sách" className="mb-8 flex flex-wrap gap-x-6 gap-y-2 text-sm uppercase">
-        {SECTIONS.map((s, i) => (
-          <a key={s.id} href={`#${s.id}`} className="underline underline-offset-4 hover:text-gold">
-            {i + 1}. {s.title}
-          </a>
-        ))}
-      </nav>
       {SECTIONS.map((s, i) => (
-        <section key={s.id} id={s.id} className="scroll-mt-16 border-t-[3px] border-double border-roast pb-8 pt-4">
+        <section key={s.id} id={s.id} className="scroll-mt-36 border-t-[3px] border-double border-roast pb-8 pt-4">
           <h2 className="text-2xl font-black">
             <span className="text-gold">Điều {i + 1}.</span> {s.title}
           </h2>
