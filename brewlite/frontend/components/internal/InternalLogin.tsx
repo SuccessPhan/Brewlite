@@ -14,11 +14,19 @@ import QuickLogin from '@/components/auth/QuickLogin';
 import { AlertIcon } from '@/components/ui/Icons';
 
 const AREAS = [
-  { title: 'Quầy pha chế', text: 'Hàng đợi đơn đã thanh toán: chờ pha, đang pha, chờ khách lấy.', who: 'Nhân viên quầy' },
-  { title: 'Quản lý kho', text: 'Nguyên liệu, nhập kho, kiểm kho, công thức định lượng, nhà cung cấp.', who: 'Quản lý' },
+  {
+    title: 'Quầy pha chế',
+    text: 'Hàng đợi đơn đã thanh toán: chờ pha, đang pha, chờ khách lấy.',
+    who: 'Nhân viên quầy',
+  },
+  {
+    title: 'Quản lý kho',
+    text: 'Nguyên liệu, nhập kho, kiểm kho, công thức định lượng, nhà cung cấp.',
+    who: 'Quản lý',
+  },
 ];
 
-const field = 'mt-1.5 h-12 w-full border-2 border-roast/30 bg-foam px-4 placeholder:text-roast/40 focus:border-roast focus:outline-none';
+const field = 'mt-1.5 h-12 w-full font-serif normal-case tracking-normal border-2 border-roast/30 bg-foam px-4 placeholder:text-roast/40 focus:border-roast focus:outline-none';
 
 export default function InternalLogin({ next }: { next: string }) {
   const router = useRouter();
@@ -67,37 +75,39 @@ export default function InternalLogin({ next }: { next: string }) {
   return (
     <main className="grid min-h-dvh lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
       {/* Cột trái: giới thiệu khu nội bộ */}
-      <section className="flex flex-col justify-between gap-6 bg-roast px-6 py-6 text-cream sm:px-10 lg:gap-10 lg:py-12">
-        <div className="flex items-center gap-3">
-          <span className="font-display text-3xl font-black leading-none">BrewLite</span>
-          <span className="border border-cream/50 px-2 py-0.5 font-label text-[11px] uppercase tracking-[0.2em]">Nội bộ</span>
-        </div>
+      <section className="bg-roast px-6 py-6 text-cream sm:px-10 lg:py-12">
+        <div className="mx-auto flex h-full w-full max-w-lg flex-col justify-between gap-6 lg:gap-10">
+          <div className="flex items-center gap-3">
+            <span className="font-display text-3xl font-black leading-none">BrewLite</span>
+            <span className="border border-cream/50 px-2 py-0.5 font-label text-[11px] uppercase tracking-[0.2em]">Nội bộ</span>
+          </div>
 
-        <div>
-          <p className="font-label text-xs uppercase tracking-[0.3em] text-cream/60">Sổ quầy · Sổ kho</p>
-          <h1 className="mt-3 max-w-md font-display text-3xl font-black leading-[1.05] sm:text-5xl">Ca làm việc bắt đầu từ đây.</h1>
-          <ul className="mt-8 hidden max-w-md divide-y divide-cream/20 border-y border-cream/20 lg:block">
-            {AREAS.map((a) => (
-              <li key={a.title} className="py-4">
-                <p className="flex items-baseline justify-between gap-3">
-                  <span className="font-display text-xl font-bold">{a.title}</span>
-                  <span className="font-label text-[10px] uppercase tracking-wider text-cream/55">{a.who}</span>
-                </p>
-                <p className="mt-1 text-sm text-cream/70">{a.text}</p>
-              </li>
-            ))}
-          </ul>
-        </div>
+          <div>
+            <p className="font-label text-xs uppercase tracking-[0.3em] text-cream/60">Sổ quầy · Sổ kho</p>
+            <h1 className="mt-3 max-w-lg font-display text-3xl font-black leading-[1.05] sm:text-5xl">Ca làm việc bắt đầu từ đây.</h1>
+            <ul className="mt-8 hidden divide-y divide-cream/20 border-y border-cream/20 lg:block">
+              {AREAS.map((a) => (
+                <li key={a.title} className="py-4">
+                  <p className="flex items-baseline justify-between gap-3">
+                    <span className="font-display text-xl font-bold">{a.title}</span>
+                    <span className="font-label text-[10px] uppercase tracking-wider text-cream/55">{a.who}</span>
+                  </p>
+                  <p className="mt-1 text-sm text-cream/70">{a.text}</p>
+                </li>
+              ))}
+            </ul>
+          </div>
 
-        <div className="flex flex-wrap items-end justify-between gap-4 text-sm text-cream/60">
-          <p className="hidden lg:block">
-            {STORE.address}
-            <br />
-            Mở cửa {STORE.hours}
-          </p>
-          <Link href="/" className="font-label text-xs font-semibold uppercase tracking-wider text-cream underline underline-offset-4 hover:text-cream/70">
-            ← Về trang của khách
-          </Link>
+          <div className="flex flex-wrap items-end justify-between gap-4 text-sm text-cream/60">
+            <p className="hidden lg:block">
+              {STORE.address}
+              <br />
+              Mở cửa {STORE.hours}
+            </p>
+            <Link href="/" className="font-label text-xs font-semibold uppercase tracking-wider text-cream underline underline-offset-4 hover:text-cream/70">
+              ← Về trang của khách
+            </Link>
+          </div>
         </div>
       </section>
 

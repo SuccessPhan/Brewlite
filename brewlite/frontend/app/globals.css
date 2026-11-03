@@ -107,6 +107,15 @@ button { text-transform: uppercase; }
 /* Nút là cả một dòng nội dung (dòng giao dịch...): giữ chữ thường như văn bản */
 .plain-btn { font-family: var(--font-serif); text-transform: none; letter-spacing: normal; }
 
+/* Ô nhập được trình duyệt tự điền: giữ nền giấy thay cho nền xanh mặc định */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 100px var(--color-foam) inset;
+  -webkit-text-fill-color: var(--color-roast);
+  caret-color: var(--color-roast);
+}
+
 /* Giá tiền, mã đơn: chữ máy đánh chữ */
 .tabular-nums { font-family: var(--font-mono); }
 

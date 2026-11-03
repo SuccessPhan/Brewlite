@@ -69,9 +69,11 @@ export default function InternalShell({ children }: { children: ReactNode }) {
           </nav>
 
           <div className="ml-auto flex items-center gap-2 sm:gap-4">
-            <Link href="/" className="inline-flex h-9 items-center border border-cream/50 px-3 font-label text-xs font-semibold uppercase tracking-wider hover:bg-cream hover:text-roast">
-              <span className="hidden sm:inline">Xem trang khách&nbsp;</span>↗
-            </Link>
+            {user.role === 'MANAGER' && (
+              <Link href="/" className="inline-flex h-9 items-center border border-cream/50 px-3 font-label text-xs font-semibold uppercase tracking-wider hover:bg-cream hover:text-roast">
+                <span className="hidden sm:inline">Xem trang khách&nbsp;</span>↗
+              </Link>
+            )}
             <span className="hidden text-right leading-tight sm:block">
               <span className="block text-sm font-semibold">{user.fullName}</span>
               <span className="block font-label text-[10px] uppercase tracking-wider text-cream/60">{ROLE_LABEL[user.role]}</span>
@@ -88,7 +90,11 @@ export default function InternalShell({ children }: { children: ReactNode }) {
             {areas.map((a) => {
               const on = pathname.startsWith(a.href);
               return (
-                <Link key={a.href} href={a.href} className={`flex-1 border-b-[3px] py-2 text-center font-label text-xs font-semibold uppercase tracking-wider ${on ? 'border-gold' : 'border-transparent text-cream/60'}`}>
+                <Link
+                  key={a.href}
+                  href={a.href}
+                  className={`flex-1 border-b-[3px] py-2 text-center font-label text-xs font-semibold uppercase tracking-wider ${on ? 'border-gold' : 'border-transparent text-cream/60'}`}
+                >
                   {a.label}
                 </Link>
               );
@@ -102,7 +108,9 @@ export default function InternalShell({ children }: { children: ReactNode }) {
       ) : (
         <main className="mx-auto mt-14 max-w-md border-2 border-roast px-6 py-10 text-center">
           <LockIcon className="mx-auto h-10 w-10 text-gold" />
-          <p className="mt-3 font-display text-2xl font-black">{user.role === 'CUSTOMER' ? 'Khu dành cho nhân viên' : pathname.startsWith('/quan-ly') ? 'Khu dành cho quản lý' : 'Khu dành cho nhân viên quầy'}</p>
+          <p className="mt-3 font-display text-2xl font-black">
+            {user.role === 'CUSTOMER' ? 'Khu dành cho nhân viên' : pathname.startsWith('/quan-ly') ? 'Khu dành cho quản lý' : 'Khu dành cho nhân viên quầy'}
+          </p>
           <p className="mt-2 text-sm text-roast/70">
             {user.role === 'CUSTOMER'
               ? 'Bạn đang đăng nhập bằng tài khoản khách hàng. Nhân viên đăng nhập bằng tài khoản được cửa hàng cấp.'
