@@ -18,7 +18,7 @@ export type VoucherResult =
   | { ok: true; code: string; label: string; discount: number; freeShip: boolean }
   | { ok: false; code: string; message: string };
 
-export const VOUCHER_HINT = 'Mã thử nghiệm: BREW20, VNPAY20, FREESHIP';
+export const VOUCHER_HINT = 'Mỗi đơn dùng được một mã. Xem mã đang có ở mục Ưu đãi.';
 
 /** Xem trước mã giảm giá (luật giống backend: bảng Voucher trong CSDL) */
 export function applyVoucher(raw: string, subtotal: number, fulfillment: Fulfillment, method: PaymentMethodId | null): VoucherResult {

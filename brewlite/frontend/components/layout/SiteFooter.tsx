@@ -32,7 +32,7 @@ export default function SiteFooter() {
         <div className="lg:col-span-2 lg:pr-8">
           <p className="font-display text-4xl font-black leading-none">BrewLite</p>
           <p className="mt-3 max-w-md text-sm leading-relaxed text-roast/80">
-            Quán cà phê nhỏ ở góc An Dương Vương. Khách đặt món trên web, trả qua VNPay hoặc bằng điểm, tới quầy đọc mã đơn là nhận ly, khỏi xếp hàng giờ cao điểm.
+            Cà phê phin, cà phê máy, trà trái cây và bánh nướng mỗi sáng. Đặt trước trên web, tới quầy là có ly.
           </p>
           <dl className="mt-4 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-sm">
             <dt className="font-label text-xs uppercase tracking-wider text-roast/60">Địa chỉ</dt>
@@ -58,10 +58,7 @@ export default function SiteFooter() {
           </nav>
         ))}
       </div>
-      <div className="mx-auto mt-8 flex max-w-6xl flex-wrap justify-between gap-2 border-t border-roast px-4 pt-3 font-mono text-[11px] uppercase tracking-wider text-roast/60">
-        <span>© {new Date().getFullYear()} BrewLite · Thanh toán thử nghiệm qua VNPay sandbox</span>
-        <span>Đồ án môn Công nghệ Phần mềm · Trường Đại học Sài Gòn</span>
-      </div>
+      <p className="mx-auto mt-8 max-w-6xl border-t border-roast px-4 pt-3 text-xs text-roast/60">© {new Date().getFullYear()} BrewLite. Mọi quyền được bảo lưu.</p>
     </footer>
   );
 }

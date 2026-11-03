@@ -19,7 +19,7 @@ const REWARDS = [
 
 export default function DealsPage() {
   return (
-    <Article kicker="Mục ưu đãi" title="Mã giảm giá đang áp dụng" lead="Nhập mã ở bước thanh toán. Máy chủ kiểm tra điều kiện và tự tính lại số tiền, mỗi đơn dùng một mã.">
+    <Article kicker="Mục ưu đãi" title="Mã giảm giá đang áp dụng" lead="Nhập mã ở bước thanh toán. Mỗi đơn dùng được một mã.">
       <ul className="grid gap-4 sm:grid-cols-3">
         {VOUCHERS.map((v) => (
           <li key={v.code} className="border-2 border-dashed border-roast p-4">
@@ -32,7 +32,7 @@ export default function DealsPage() {
 
       <h2 className="mt-12 border-t-[3px] border-double border-roast pt-4 text-3xl font-black">Đổi điểm lấy quà</h2>
       <p className="mt-2 text-roast/80">
-        Mỗi 1.000đ thanh toán thành công được cộng 1 điểm. Tài khoản mới được tặng sẵn 1.250 điểm. Điểm cũng dùng để trả thẳng cho đơn (100đ mỗi điểm).
+        Mỗi 1.000đ thanh toán được cộng 1 điểm, thành viên mới được tặng 1.250 điểm. Điểm còn dùng để trừ thẳng vào đơn, mỗi điểm 100đ.
       </p>
       <table className="mt-4 w-full border-collapse text-left">
         <thead>

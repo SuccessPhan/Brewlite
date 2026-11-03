@@ -10,6 +10,8 @@ import { PaymentsModule } from './payments/payments.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { ProductsModule } from './products/products.module';
 import { PromotionsModule } from './promotions/promotions.module';
+import { FavoritesModule } from './favorites/favorites.module';
+import { NotificationsModule } from './notifications/notifications.module';
 import { StaffModule } from './staff/staff.module';
 
 @Module({
@@ -28,6 +30,8 @@ import { StaffModule } from './staff/staff.module';
     OrdersModule,
     PaymentsModule,
     StaffModule,
+    NotificationsModule,
+    FavoritesModule,
   ],
   controllers: [AppController],
   providers: [AppService, { provide: APP_GUARD, useClass: ThrottlerGuard }],

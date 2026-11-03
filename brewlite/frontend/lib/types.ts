@@ -184,11 +184,14 @@ export interface Reward {
   cost: number;
 }
 
+/** Thông báo từ backend (GET /notifications/me). readAt rỗng = chưa đọc */
 export interface AppNotification {
   id: string;
+  orderId: string | null;
   title: string;
   body: string;
-  time: string;
+  createdAt: string;
+  readAt: string | null;
 }
 
 /** CUSTOMER: khách đặt món. STAFF: nhân viên quầy */

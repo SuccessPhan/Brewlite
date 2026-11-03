@@ -29,6 +29,7 @@ export class AuthService {
           passwordHash,
           loyaltyPoints: WELCOME_POINTS,
           loyaltyLogs: { create: { delta: WELCOME_POINTS, reason: 'Quà chào mừng thành viên mới' } },
+          notifications: { create: { title: `Bạn được tặng ${WELCOME_POINTS.toLocaleString('vi-VN')} điểm`, body: 'Quà chào mừng thành viên mới. Dùng điểm để trả cho đơn hoặc đổi quà ở trang Tài khoản.' } },
         },
       });
       return this.session(user);

@@ -185,7 +185,7 @@ export default function Checkout() {
         setPay({ step: 'failed', reason: 'declined', message: result.payment.failureReason ?? 'Giao dịch bị từ chối.', order: result.order });
       }
     } catch (err) {
-      setPay({ step: 'failed', reason: 'server', message: errorText(err, 'Máy chủ chưa xử lý được giao dịch.'), order });
+      setPay({ step: 'failed', reason: 'server', message: errorText(err, 'Chưa xử lý được thanh toán, bạn thử lại nhé.'), order });
     }
   }
 
@@ -480,7 +480,7 @@ export default function Checkout() {
               <p className="mt-1 text-right text-xs text-roast/55">
                 {method === 'POINTS' ? `Trừ ${formatNumber(pointsNeeded)} điểm` : `Tích ${formatNumber(pointsEarnedFor(total))} điểm sau khi thanh toán`}
               </p>
-              {method === 'VNPAY' && <p className="mt-1 text-right text-xs text-roast/55">Trả trên cổng VNPay (môi trường thử sandbox)</p>}
+              {method === 'VNPAY' && <p className="mt-1 text-right text-xs text-roast/55">Bạn sẽ được chuyển sang trang thanh toán của VNPay</p>}
             </section>
 
             <div className="fixed inset-x-0 bottom-0 z-20 border-t border-roast/10 bg-foam px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3 md:static md:mt-4 md:border-0 md:bg-transparent md:p-0">

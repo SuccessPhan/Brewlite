@@ -1,9 +1,9 @@
 'use client';
 
-// Thẻ món kiểu "tin rao" trên báo: ảnh in ngả màu (rê chuột hiện màu thật), tên món chữ tít, giá chữ máy đánh.
+// Thẻ món kiểu "tin rao" trên báo: ảnh in cùng một tông trong khung viền, tên món chữ tít, giá chữ máy đánh.
 import Link from 'next/link';
-import { useAppStore } from '@/context/app-store';
-import { formatNumber, formatVnd } from '@/lib/format';
+import { useFavorites } from '@/lib/favorites';
+import { formatVnd } from '@/lib/format';
 import type { Range } from '@/lib/search';
 import type { Product } from '@/lib/types';
 import { useProductSheet } from '@/components/product/ProductSheetProvider';
@@ -19,7 +19,7 @@ interface Props {
 }
 
 export default function ProductCard({ product, ranges = [], index = 0 }: Props) {
-  const { favorites, toggleFavorite } = useAppStore();
+  const { favorites, toggleFavorite } = useFavorites();
   const { openProduct } = useProductSheet();
   const favorite = favorites.includes(product.id);
   const soldOut = product.stock <= 0;
@@ -30,12 +30,14 @@ export default function ProductCard({ product, ranges = [], index = 0 }: Props) 
       <Link href={`/product/${product.id}`} className="absolute inset-0 z-10" aria-label={`Xem chi tiết ${product.name}`} />
       <div className="flex items-center justify-between font-label text-[11px] uppercase tracking-wider">
         <span className={product.tag === 'hot' ? 'text-gold' : product.tag === 'new' ? 'text-leaf' : 'text-roast/50'}>
-          {product.tag === 'hot' ? 'Bán chạy' : product.tag === 'new' ? 'Món mới' : 'Thực đơn'}
+          {product.tag === 'hot' ? 'Bán chạy' : product.tag === 'new' ? 'Món mới' : ''}
         </span>
         <span className="text-roast/60">★ {product.rating.toFixed(1).replace('.', ',')}</span>
       </div>
-      <div className="relative mt-2 aspect-[4/5] overflow-hidden">
-        <ProductImage product={product} className="newsprint h-full w-full" />
+      <div className="relative mt-2 aspect-square overflow-hidden border border-roast bg-cream p-1.5">
+        <div className="h-full w-full overflow-hidden bg-cream">
+          <ProductImage product={product} className="menu-print h-full w-full" />
+        </div>
         <button
           type="button"
           onClick={() => toggleFavorite(product.id)}
@@ -56,7 +58,6 @@ export default function ProductCard({ product, ranges = [], index = 0 }: Props) 
       <h3 className="mt-2 text-lg font-bold leading-tight">
         <Highlight text={product.name} ranges={ranges} />
       </h3>
-      <p className="mt-0.5 font-label text-[11px] uppercase tracking-wider text-roast/55">{formatNumber(product.sold)} ly đã bán</p>
       <div className="mt-auto flex items-center justify-between gap-2 border-t border-dotted border-roast/60 pt-2">
         <span className="tabular-nums font-semibold">{formatVnd(product.price)}</span>
         <button

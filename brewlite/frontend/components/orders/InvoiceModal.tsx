@@ -28,7 +28,7 @@ export default function InvoiceModal({ order, onClose }: { order: Order | null; 
           </div>
 
           <div className="mt-4 rounded-2xl bg-cream p-4 text-sm">
-            <p className="font-bold">Công ty TNHH BrewLite (dữ liệu mẫu)</p>
+            <p className="font-bold">BrewLite</p>
             <p className="text-roast/65">{STORE.name}, {STORE.address}</p>
             <p className="text-roast/65">Thanh toán: {PAYMENT_METHODS.find((m) => m.id === order.paymentMethod)?.name}</p>
           </div>

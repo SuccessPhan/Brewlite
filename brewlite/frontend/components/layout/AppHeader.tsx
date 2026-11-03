@@ -7,9 +7,11 @@ import { useEffect, useState } from 'react';
 import { useAppStore } from '@/context/app-store';
 import { useAuth } from '@/context/auth-context';
 import { CART_BUMP_EVENT } from '@/lib/fly-to-cart';
+import { formatVnd } from '@/lib/format';
 import { STORE } from '@/lib/mock-data';
 import SearchBox from '@/components/search/SearchBox';
 import { BagIcon } from '@/components/ui/Icons';
+import CartDrawer from './CartDrawer';
 import NotificationBell from './NotificationBell';
 import UserMenu from './UserMenu';
 
@@ -24,23 +26,22 @@ export const NAV_LINKS = [
   { href: '/lien-he', label: 'Liên hệ' },
 ];
 
-/** Dòng trên cùng của báo: số báo (ngày thứ mấy trong năm) và thứ, ngày */
-function issueLine(now: Date) {
-  const start = new Date(now.getFullYear(), 0, 0);
-  const issue = Math.floor((now.getTime() - start.getTime()) / 86_400_000);
-  const date = `${String(now.getDate()).padStart(2, '0')}.${String(now.getMonth() + 1).padStart(2, '0')}.${now.getFullYear()}`;
-  return { issue, text: `${WEEKDAYS[now.getDay()]}, ${date}` };
+/** Dòng trên cùng: thứ, ngày hôm nay */
+function todayLine(now: Date) {
+  const date = `${String(now.getDate()).padStart(2, '0')}/${String(now.getMonth() + 1).padStart(2, '0')}/${now.getFullYear()}`;
+  return `${WEEKDAYS[now.getDay()]}, ${date}`;
 }
 
 export default function AppHeader() {
   const pathname = usePathname();
-  const { cartCount, hydrated } = useAppStore();
+  const { cartCount, subtotal, hydrated } = useAppStore();
   const { user } = useAuth();
   const [bump, setBump] = useState(false);
-  const [today, setToday] = useState<{ issue: number; text: string } | null>(null);
+  const [cartOpen, setCartOpen] = useState(false);
+  const [today, setToday] = useState<string | null>(null);
 
   // Ngày tính ở trình duyệt để khớp giờ của khách (tránh lệch giữa máy chủ và trình duyệt)
-  useEffect(() => setToday(issueLine(new Date())), []);
+  useEffect(() => setToday(todayLine(new Date())), []);
 
   // Giỏ hàng "nảy" lên mỗi khi có món bay vào
   useEffect(() => {
@@ -59,15 +60,13 @@ export default function AppHeader() {
     <>
       <div className="mx-auto max-w-6xl px-4 pt-3">
         <div className="flex items-center justify-between gap-3 font-mono text-[10px] uppercase tracking-wider text-roast/70 sm:text-[11px]">
-          <span>{today ? `Số ${today.issue} · ${today.text}` : ' '}</span>
-          <span className="hidden sm:inline">
-            {STORE.address} · Mở cửa {STORE.hours}
-          </span>
-          <span>Giá: không tiền mặt</span>
+          <span>{today ?? ' '}</span>
+          <span className="hidden sm:inline">{STORE.address}</span>
+          <span>Mở cửa {STORE.hours}</span>
         </div>
         <Link href="/" className="mt-1 block border-y-[3px] border-double border-roast py-1 text-center sm:py-2" aria-label="BrewLite, về trang nhất">
           <span className="block font-display text-[2.6rem] font-black leading-none tracking-tight sm:text-6xl md:text-7xl">BrewLite</span>
-          <span className="mt-1 block font-label text-[10px] uppercase tracking-[0.3em] text-roast/70 sm:text-xs">Nhật báo cà phê · Sài Gòn · Đặt trước, khỏi xếp hàng</span>
+          <span className="mt-1 block font-label text-[10px] uppercase tracking-[0.3em] text-roast/70 sm:text-xs">Cà phê phin Sài Gòn · Đặt trước, khỏi xếp hàng</span>
         </Link>
       </div>
 
@@ -92,26 +91,33 @@ export default function AppHeader() {
             <SearchBox />
           </div>
           <div className="flex shrink-0 items-center gap-0.5">
-            <NotificationBell />
-            <Link
-              href="/checkout"
+            <NotificationBell withLabel />
+            {/* Giỏ hàng: bấm mở khung giỏ nhanh bên phải; trên máy tính hiện luôn số món và tạm tính */}
+            <button
+              type="button"
+              onClick={() => setCartOpen(true)}
               data-cart-target
               aria-label={`Giỏ hàng, ${hydrated ? cartCount : 0} món`}
-              className="relative grid h-10 w-10 place-items-center hover:bg-roast/5"
+              className="relative flex h-11 items-center gap-2 px-2 normal-case tracking-normal hover:bg-roast/5"
             >
               <span className={bump ? 'animate-bump' : ''} onAnimationEnd={() => setBump(false)}>
-                <BagIcon className="h-6 w-6" />
+                <BagIcon className="h-7 w-7" />
+              </span>
+              <span className="hidden text-left leading-tight lg:block">
+                <span className="block font-label text-sm font-medium uppercase tracking-wider">Giỏ hàng</span>
+                <span className="block font-mono text-[11px] text-roast/70">{hydrated && cartCount > 0 ? `${cartCount} món · ${formatVnd(subtotal)}` : 'Chưa có món'}</span>
               </span>
               {hydrated && cartCount > 0 && (
-                <span key={cartCount} className="absolute -right-0.5 top-0 h-5 min-w-5 animate-pop-in bg-gold px-1 text-center font-mono text-[11px] font-semibold leading-5 text-foam">
+                <span key={cartCount} className="absolute left-5 top-0.5 h-5 min-w-5 animate-pop-in bg-gold px-1 text-center font-mono text-[11px] font-semibold leading-5 text-foam">
                   {cartCount}
                 </span>
               )}
-            </Link>
+            </button>
             <UserMenu />
           </div>
         </div>
       </header>
+      <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} />
     </>
   );
 }

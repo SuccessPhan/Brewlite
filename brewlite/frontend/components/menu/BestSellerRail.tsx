@@ -1,9 +1,9 @@
 'use client';
 
-// "Bảng xếp hạng tuần": 6 món bán chạy nhất, mỗi món một cột ngăn bằng đường kẻ dọc như mục thống kê trên báo
+// "Món bán chạy": 6 món được gọi nhiều nhất, mỗi món một cột ngăn bằng đường kẻ dọc như mục trên báo
 import Link from 'next/link';
 import { useMemo } from 'react';
-import { formatNumber, formatVnd } from '@/lib/format';
+import { formatVnd } from '@/lib/format';
 import { useProducts } from '@/lib/products';
 import { useProductSheet } from '@/components/product/ProductSheetProvider';
 import Skeleton from '@/components/ui/Skeleton';
@@ -19,9 +19,9 @@ export default function BestSellerRail() {
     <section aria-labelledby="best-title">
       <div className="flex items-end justify-between gap-3 border-b-2 border-roast pb-2">
         <h2 id="best-title" className="text-3xl font-black">
-          Bảng xếp hạng tuần
+          Món bán chạy
         </h2>
-        <p className="kicker hidden sm:block">Theo số ly đã bán</p>
+        <p className="kicker hidden sm:block">Khách quen hay gọi</p>
       </div>
       <ol className="no-scrollbar -mx-4 flex snap-x overflow-x-auto px-4 lg:mx-0 lg:grid lg:grid-cols-6 lg:px-0">
         {isLoading && [0, 1, 2, 3].map((i) => <Skeleton key={i} className="mr-4 mt-4 h-64 w-40 shrink-0" />)}
@@ -29,11 +29,10 @@ export default function BestSellerRail() {
           <li key={p.id} className="group relative w-44 shrink-0 snap-start border-l border-roast px-4 py-4 first:border-l-0 lg:w-auto">
             <Link href={`/product/${p.id}`} className="absolute inset-0 z-10" aria-label={`Xem chi tiết ${p.name}`} />
             <span className="font-display text-5xl font-black leading-none text-gold">{String(i + 1).padStart(2, '0')}</span>
-            <div className="mt-2 aspect-square overflow-hidden">
-              <ProductImage product={p} width={400} className="newsprint h-full w-full" />
+            <div className="mt-2 aspect-square overflow-hidden border border-roast bg-cream p-1">
+              <ProductImage product={p} width={400} className="menu-print h-full w-full" />
             </div>
             <p className="mt-2 font-display text-lg font-bold leading-tight">{p.name}</p>
-            <p className="font-label text-[11px] uppercase tracking-wider text-roast/60">{formatNumber(p.sold)} ly</p>
             <div className="mt-1 flex items-center justify-between gap-2">
               <span className="tabular-nums text-sm font-semibold">{formatVnd(p.price)}</span>
               <button

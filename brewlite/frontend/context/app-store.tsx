@@ -1,7 +1,7 @@
 'use client';
 
 // GIỎ HÀNG (Task 5) quản lý bằng Zustand, lưu localStorage để tải lại trang không mất.
-// Kèm món yêu thích của khách.
+// Món yêu thích không ở đây: lưu theo tài khoản trên máy chủ (lib/favorites.ts).
 import { useEffect, type ReactNode } from 'react';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
@@ -66,35 +66,23 @@ export const useCartStore = create<CartState>()(
   ),
 );
 
-interface PrefsState {
-  favorites: string[];
-  toggleFavorite: (productId: string) => void;
-}
-
-export const usePrefsStore = create<PrefsState>()(
-  persist(
-    (set) => ({
-      favorites: [],
-      toggleFavorite: (id) => set((s) => ({ favorites: s.favorites.includes(id) ? s.favorites.filter((f) => f !== id) : [...s.favorites, id] })),
-    }),
-    { name: 'brewlite.prefs', storage: createJSONStorage(() => localStorage), skipHydration: true },
-  ),
-);
-
 const useHydration = create<{ hydrated: boolean }>(() => ({ hydrated: false }));
 
 /** Nạp giỏ hàng đã lưu sau khi trang chạy trên trình duyệt (tránh lệch giữa HTML server và client) */
 export function AppStoreProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
-    Promise.all([useCartStore.persist.rehydrate(), usePrefsStore.persist.rehydrate()]).finally(() => useHydration.setState({ hydrated: true }));
+    // Bản cũ từng lưu món yêu thích trong trình duyệt; giờ đã chuyển lên tài khoản nên dọn đi
+    try {
+      localStorage.removeItem('brewlite.prefs');
+    } catch {}
+    Promise.resolve(useCartStore.persist.rehydrate()).finally(() => useHydration.setState({ hydrated: true }));
   }, []);
   return <>{children}</>;
 }
 
-/** Hook gộp tiện dùng cho component: giỏ hàng + tuỳ chọn cá nhân */
+/** Hook gộp tiện dùng cho component: giỏ hàng */
 export function useAppStore() {
   const cart = useCartStore();
-  const prefs = usePrefsStore();
   const hydrated = useHydration((s) => s.hydrated);
   return {
     hydrated,
@@ -107,7 +95,5 @@ export function useAppStore() {
     setQuantity: cart.setQuantity,
     removeFromCart: cart.remove,
     clearCart: cart.clear,
-    favorites: prefs.favorites,
-    toggleFavorite: prefs.toggleFavorite,
   };
 }

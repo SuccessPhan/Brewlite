@@ -3,9 +3,10 @@
 // Bộ chọn tuỳ chọn món: size, đường, đá, topping, ghi chú, số lượng.
 // Dùng chung cho trang chi tiết món và tấm "Thêm vào giỏ" bật lên khi bấm nút +.
 import { useState, type ReactNode } from 'react';
-import { MAX_QTY, useAppStore } from '@/context/app-store';
+import { MAX_QTY } from '@/context/app-store';
 import { CATEGORIES, SIZES } from '@/lib/mock-data';
-import { formatNumber, formatVnd } from '@/lib/format';
+import { useFavorites } from '@/lib/favorites';
+import { formatVnd } from '@/lib/format';
 import { unitPriceOf } from '@/lib/pricing';
 import type { CartItem, Level, NewCartItem, Product, SizeId } from '@/lib/types';
 import QuantityStepper from '@/components/ui/QuantityStepper';
@@ -38,7 +39,7 @@ function OptionGroup({ title, aside, children }: { title: string; aside?: string
 }
 
 export default function ProductCustomizer({ product, initial, variant, submitLabel, titleId, onSubmit }: Props) {
-  const { favorites, toggleFavorite } = useAppStore();
+  const { favorites, toggleFavorite } = useFavorites();
   const isDrink = product.kind === 'drink';
   const [size, setSize] = useState<SizeId>(initial?.size ?? 'M');
   const [sugar, setSugar] = useState<Level>(initial?.sugar ?? 100);
@@ -91,7 +92,6 @@ export default function ProductCustomizer({ product, initial, variant, submitLab
         <span className="text-xl font-bold tabular-nums text-espresso">{formatVnd(product.price)}</span>
         <span className="inline-flex items-center gap-1 text-roast/70">
           <StarIcon className="h-4 w-4 text-gold" /> {product.rating.toFixed(1).replace('.', ',')}
-          <span className="text-roast/50">({formatNumber(product.sold)} đã bán)</span>
         </span>
         {soldOut ? (
           <span className="rounded-full bg-chili/10 px-2.5 py-0.5 text-xs font-bold text-chili">Hết hàng</span>

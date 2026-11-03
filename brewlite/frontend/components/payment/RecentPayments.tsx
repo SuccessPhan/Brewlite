@@ -16,7 +16,7 @@ export default function RecentPayments() {
           Xem tất cả
         </Link>
       </div>
-      <p className="mt-1 text-sm text-roast/60">Thanh toán qua cổng VNPay (môi trường thử sandbox) hoặc bằng điểm.</p>
+      <p className="mt-1 text-sm text-roast/60">Các lần thanh toán qua VNPay hoặc bằng điểm.</p>
       {!payments ? (
         <div className="mt-4 space-y-2">
           <Skeleton className="h-12" />

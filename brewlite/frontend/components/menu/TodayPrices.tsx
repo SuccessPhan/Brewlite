@@ -9,7 +9,7 @@ import Skeleton from '@/components/ui/Skeleton';
 export default function TodayPrices() {
   const { data, isError } = useProducts();
 
-  if (isError) return <p className="py-4 text-sm text-chili">Chưa lấy được bảng giá, thử tải lại trang.</p>;
+  if (isError) return <p className="py-4 text-sm text-chili">Chưa tải được bảng giá.</p>;
   if (!data) {
     return (
       <div className="space-y-3 py-2" aria-busy="true">

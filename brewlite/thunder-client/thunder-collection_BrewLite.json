@@ -47,6 +47,13 @@
       "containerId": "",
       "created": "2026-11-03T12:00:00.000Z",
       "sortNum": 60000
+    },
+    {
+      "_id": "b5cf757f-bdfe-54b2-aa40-4aaf6c408cd7",
+      "name": "7. Món yêu thích (lưu theo tài khoản)",
+      "containerId": "",
+      "created": "2026-11-03T12:00:00.000Z",
+      "sortNum": 70000
     }
   ],
   "requests": [
@@ -951,6 +958,152 @@
         "raw": "{\n  \"email\": \"demo@brewlite.vn\",\n  \"password\": \"sai-mat-khau\"\n}",
         "form": []
       }
+    },
+    {
+      "_id": "66cb2658-3138-5ac7-88ff-9b33684486a2",
+      "colId": "7aca99f7-a0f4-5f46-ad12-c95a3b8933db",
+      "containerId": "b5cf757f-bdfe-54b2-aa40-4aaf6c408cd7",
+      "name": "Lưu món yêu thích: Bạc xỉu",
+      "url": "http://localhost:3001/favorites/bac-xiu",
+      "method": "PUT",
+      "sortNum": 340000,
+      "created": "2026-11-03T12:00:00.000Z",
+      "modified": "2026-11-03T12:00:00.000Z",
+      "headers": [],
+      "params": [],
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "200"
+        }
+      ],
+      "auth": {
+        "type": "bearer",
+        "bearer": "{{token}}"
+      }
+    },
+    {
+      "_id": "6c2642f4-3344-5744-91bf-74937cc11013",
+      "colId": "7aca99f7-a0f4-5f46-ad12-c95a3b8933db",
+      "containerId": "b5cf757f-bdfe-54b2-aa40-4aaf6c408cd7",
+      "name": "Lưu lại lần nữa vẫn chỉ một món",
+      "url": "http://localhost:3001/favorites/bac-xiu",
+      "method": "PUT",
+      "sortNum": 350000,
+      "created": "2026-11-03T12:00:00.000Z",
+      "modified": "2026-11-03T12:00:00.000Z",
+      "headers": [],
+      "params": [],
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "200"
+        }
+      ],
+      "auth": {
+        "type": "bearer",
+        "bearer": "{{token}}"
+      }
+    },
+    {
+      "_id": "a1a4ae88-77bc-5348-a9f9-9ebd1347b7e8",
+      "colId": "7aca99f7-a0f4-5f46-ad12-c95a3b8933db",
+      "containerId": "b5cf757f-bdfe-54b2-aa40-4aaf6c408cd7",
+      "name": "Danh sách món yêu thích của tôi",
+      "url": "http://localhost:3001/favorites/me",
+      "method": "GET",
+      "sortNum": 360000,
+      "created": "2026-11-03T12:00:00.000Z",
+      "modified": "2026-11-03T12:00:00.000Z",
+      "headers": [],
+      "params": [],
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "200"
+        }
+      ],
+      "auth": {
+        "type": "bearer",
+        "bearer": "{{token}}"
+      }
+    },
+    {
+      "_id": "bcdf8f0c-30eb-5479-a877-2deeb749bf22",
+      "colId": "7aca99f7-a0f4-5f46-ad12-c95a3b8933db",
+      "containerId": "b5cf757f-bdfe-54b2-aa40-4aaf6c408cd7",
+      "name": "Lưu món không có: 404",
+      "url": "http://localhost:3001/favorites/khong-co-mon-nay",
+      "method": "PUT",
+      "sortNum": 370000,
+      "created": "2026-11-03T12:00:00.000Z",
+      "modified": "2026-11-03T12:00:00.000Z",
+      "headers": [],
+      "params": [],
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "404"
+        }
+      ],
+      "auth": {
+        "type": "bearer",
+        "bearer": "{{token}}"
+      }
+    },
+    {
+      "_id": "a0be58ed-c0e5-5ce8-b5ed-838b4ad26456",
+      "colId": "7aca99f7-a0f4-5f46-ad12-c95a3b8933db",
+      "containerId": "b5cf757f-bdfe-54b2-aa40-4aaf6c408cd7",
+      "name": "Bỏ món yêu thích",
+      "url": "http://localhost:3001/favorites/bac-xiu",
+      "method": "DELETE",
+      "sortNum": 380000,
+      "created": "2026-11-03T12:00:00.000Z",
+      "modified": "2026-11-03T12:00:00.000Z",
+      "headers": [],
+      "params": [],
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "200"
+        }
+      ],
+      "auth": {
+        "type": "bearer",
+        "bearer": "{{token}}"
+      }
+    },
+    {
+      "_id": "b2a1dec7-a560-5ccb-81e6-20b2cdaea8a4",
+      "colId": "7aca99f7-a0f4-5f46-ad12-c95a3b8933db",
+      "containerId": "b5cf757f-bdfe-54b2-aa40-4aaf6c408cd7",
+      "name": "Chưa đăng nhập xem món yêu thích: 401",
+      "url": "http://localhost:3001/favorites/me",
+      "method": "GET",
+      "sortNum": 390000,
+      "created": "2026-11-03T12:00:00.000Z",
+      "modified": "2026-11-03T12:00:00.000Z",
+      "headers": [],
+      "params": [],
+      "tests": [
+        {
+          "type": "res-code",
+          "custom": "",
+          "action": "equal",
+          "value": "401"
+        }
+      ]
     }
   ]
 }

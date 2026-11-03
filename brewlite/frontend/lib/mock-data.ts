@@ -1,5 +1,5 @@
 // Dữ liệu cố định phía giao diện. Menu, giá, tồn kho lấy từ API GET /products (PostgreSQL).
-import type { AppNotification, Category, Level, PaymentMethodId, Reward, SizeId, Store, Topping } from './types';
+import type { Category, Level, PaymentMethodId, Reward, SizeId, Store, Topping } from './types';
 
 export const CATEGORIES: Category[] = [
   { id: 'pha-may', name: 'Cà phê pha máy' },
@@ -44,8 +44,3 @@ export const REWARDS: Reward[] = [
   { id: 'free-s', name: 'Ly cà phê size S bất kỳ', cost: 800 },
 ];
 
-export const NOTIFICATIONS: AppNotification[] = [
-  { id: 'n1', title: 'Ưu đãi VNPay tuần này', body: 'Nhập VNPAY20 khi thanh toán qua VNPay, giảm 20%, tối đa 25.000đ.', time: 'Hôm nay' },
-  { id: 'n2', title: 'Món mới: Cà phê muối', body: 'Kem muối mặn nhẹ trên nền cà phê sữa đậm. Có tại quán An Dương Vương.', time: 'Hôm qua' },
-  { id: 'n3', title: 'Bạn vừa nhận 1.250 điểm', body: 'Quà chào mừng thành viên mới. Dùng điểm để thanh toán hoặc đổi quà.', time: '3 ngày trước' },
-];

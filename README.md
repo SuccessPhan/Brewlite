@@ -220,7 +220,7 @@ Còn lại cần làm khi đưa lên mạng thật: chạy sau HTTPS, đổi m�
 
 1. Cài extension **Thunder Client** trong VS Code, chạy backend (`run-brewlite.bat` hoặc `npm run start:dev`).
 2. Thunder Client → tab **Collections** → nút menu ☰ → **Import** → chọn `brewlite/thunder-client/thunder-collection_BrewLite.json`.
-3. Chạy từng request theo thứ tự thư mục 1 → 6, hoặc chuột phải collection → **Run All**. Request đăng ký tạo một khách mới (được tặng 1.250 điểm) và lưu token vào `{{token}}`, đăng nhập nhân viên lưu `{{staffToken}}`; tạo đơn xong mã đơn lưu vào `{{orderId}}`. Mỗi request có sẵn test mã trạng thái mong đợi.
+3. Chạy từng request theo thứ tự thư mục 1 → 7, hoặc chuột phải collection → **Run All**. Request đăng ký tạo một khách mới (được tặng 1.250 điểm) và lưu token vào `{{token}}`, đăng nhập nhân viên lưu `{{staffToken}}`; tạo đơn xong mã đơn lưu vào `{{orderId}}`. Mỗi request có sẵn test mã trạng thái mong đợi.
 4. Thư mục **6. Bảo mật** là các ca phải bị chặn (401, 403, 404, 400). Request đăng nhập sai bấm liên tục 11 lần trong 1 phút sẽ nhận 429.
 
 ## API
@@ -245,6 +245,10 @@ Còn lại cần làm khi đưa lên mạng thật: chạy sau HTTPS, đổi m�
 | POST | `/payments/:id/query` | Có | Đối soát: hỏi lại VNPay (API `querydr`) |
 | GET | `/staff/orders` | Nhân viên | Hàng đợi của quầy: đơn PAID, PREPARING, READY |
 | POST | `/staff/orders/:id/advance` | Nhân viên | Chuyển đơn sang bước tiếp theo; khách gọi nhận 403 |
+| GET | `/notifications/me` | Có | Thông báo của tôi (đơn đổi trạng thái, quà chào mừng) kèm số chưa đọc |
+| POST | `/notifications/:id/read`, `/notifications/read-all` | Có | Đánh dấu đã đọc một hoặc tất cả |
+| GET | `/favorites/me` | Có | Món yêu thích, lưu theo tài khoản trên CSDL |
+| PUT / DELETE | `/favorites/:productId` | Có | Lưu / bỏ một món (lưu lại lần nữa không tạo bản trùng) |
 
 ## Cấu trúc thư mục
 

@@ -65,6 +65,8 @@ model User {
   createdAt     DateTime             @default(now())
   orders        Order[]
   loyaltyLogs   LoyaltyTransaction[]
+  notifications Notification[]
+  favorites     Favorite[]
 }
 
 model Product {
@@ -85,6 +87,7 @@ model Product {
   keywords    String[]
   toppings    Topping[]
   orderItems  OrderItem[]
+  favoritedBy Favorite[]
 }
 
 model Topping {
@@ -202,4 +205,29 @@ model LoyaltyTransaction {
   createdAt DateTime @default(now())
 
   @@index([userId, createdAt])
+}
+
+/// Thông báo gửi khách (đơn đổi trạng thái, quà chào mừng). readAt rỗng = chưa đọc
+model Notification {
+  id        String    @id @default(uuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  orderId   String? // đơn liên quan để bấm vào mở đơn; không ràng buộc khoá ngoại để xoá đơn không kéo theo lỗi
+  title     String
+  body      String
+  createdAt DateTime  @default(now())
+  readAt    DateTime?
+
+  @@index([userId, createdAt])
+}
+
+/// Món yêu thích, gắn với tài khoản (đăng nhập máy nào cũng thấy). Mỗi món chỉ lưu một lần cho một người.
+model Favorite {
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@id([userId, productId])
 }

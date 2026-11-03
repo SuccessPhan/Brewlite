@@ -5,6 +5,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { isUniqueViolation } from '../prisma/prisma-errors';
 import { PromotionsService } from '../promotions/promotions.service';
 import { CreateOrderDto } from './dto/create-order.dto';
+import { orderMessage } from '../notifications/order-messages';
 import { assertTransition, HAPPY_PATH_NEXT, OrderStatus } from './order-state-machine';
 import { DELIVERY_FEE, SIZE_EXTRA } from './pricing';
 
@@ -211,5 +212,9 @@ export async function moveOrderStatus(
   assertTransition(from, to);
   const res = await db.order.updateMany({ where: { id: orderId, status: from }, data: { ...data, status: to } });
   if (res.count === 0) throw new ConflictException('Đơn hàng vừa được cập nhật bởi một yêu cầu khác, vui lòng tải lại');
+  // Báo cho khách ngay trong cùng transaction: trạng thái đổi thì chắc chắn có thông báo, rollback thì không có
+  const order = await db.order.findUniqueOrThrow({ where: { id: orderId }, select: { userId: true, fulfillment: true } });
+  const message = orderMessage(orderId, to, order.fulfillment);
+  if (message) await db.notification.create({ data: { userId: order.userId, orderId, ...message } });
   return to;
 }

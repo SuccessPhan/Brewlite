@@ -11,26 +11,25 @@ const SECTIONS = [
       'Đơn chưa thanh toán: huỷ miễn phí bất kỳ lúc nào ở trang theo dõi đơn.',
       'Đơn đã thanh toán nhưng quầy chưa pha: liên hệ quầy để được huỷ và hoàn tiền về phương thức đã trả.',
       'Món pha sai so với đơn: quầy pha lại miễn phí khi bạn báo ngay tại quầy.',
-      'Lỡ trả hai lần cho cùng một đơn (ví dụ mở hai tab VNPay): giao dịch thứ hai được đánh dấu "cần hoàn tiền" và được hoàn lại.',
-      'Bản hiện tại chạy trên môi trường thử VNPay sandbox: không có tiền thật nào bị trừ.',
+      'Lỡ thanh toán hai lần cho cùng một đơn: khoản thứ hai được hoàn lại đầy đủ.',
     ],
   },
   {
     id: 'bao-mat',
     title: 'Bảo mật thông tin',
     items: [
-      'BrewLite chỉ lưu họ tên, email, lịch sử đơn và điểm thưởng. Mật khẩu được băm bằng bcrypt, không ai đọc được, kể cả quản trị viên.',
-      'BrewLite không lưu số thẻ. Thông tin thẻ chỉ nhập trên trang của VNPay.',
+      'BrewLite chỉ lưu họ tên, email, lịch sử đơn và điểm thưởng của bạn.',
+      'Mật khẩu được mã hoá, nhân viên BrewLite cũng không xem được.',
+      'BrewLite không lưu thông tin thẻ. Bạn nhập thẻ trên trang thanh toán của VNPay.',
       'Mỗi tài khoản chỉ xem được đơn và giao dịch của chính mình. Nhân viên quầy chỉ thấy tên khách và món cần pha.',
-      'Kết quả thanh toán được kiểm chữ ký số của VNPay trước khi ghi nhận, nên không thể sửa đường dẫn để giả kết quả.',
-      'Đăng nhập sai liên tục sẽ bị tạm chặn để chống dò mật khẩu.',
+      'Đăng nhập sai nhiều lần liên tiếp, web sẽ tạm khoá đăng nhập trong ít phút để bảo vệ tài khoản.',
     ],
   },
   {
     id: 'dieu-khoan',
     title: 'Điều khoản sử dụng',
     items: [
-      'Giá và tồn kho hiển thị theo thời gian thực; giá cuối cùng là giá máy chủ tính lúc tạo đơn.',
+      'Giá có thể thay đổi theo thời điểm; giá áp dụng là giá lúc bạn đặt đơn.',
       'Mỗi đơn áp dụng tối đa một mã giảm giá; mã có điều kiện riêng ghi ở mục Ưu đãi.',
       'Điểm thưởng chỉ cộng khi đơn thanh toán thành công và không quy đổi thành tiền mặt.',
       'BrewLite có thể khoá tài khoản dùng công cụ tự động để đặt đơn hoặc dò mã giảm giá.',
@@ -40,7 +39,7 @@ const SECTIONS = [
 
 export default function PolicyPage() {
   return (
-    <Article kicker="Văn bản" title="Chính sách và điều khoản" lead="Viết ngắn, đọc một lần là hiểu. Áp dụng cho mọi đơn đặt trên BrewLite.">
+    <Article kicker="Văn bản" title="Chính sách và điều khoản" lead="Áp dụng cho mọi đơn đặt trên BrewLite.">
       <nav aria-label="Mục lục chính sách" className="mb-8 flex flex-wrap gap-x-6 gap-y-2 text-sm uppercase">
         {SECTIONS.map((s, i) => (
           <a key={s.id} href={`#${s.id}`} className="underline underline-offset-4 hover:text-gold">
