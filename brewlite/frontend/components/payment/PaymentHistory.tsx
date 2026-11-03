@@ -12,6 +12,7 @@ import type { PaymentHistoryItem, PaymentLog } from '@/lib/types';
 import Modal from '@/components/ui/Modal';
 import Skeleton from '@/components/ui/Skeleton';
 import { AlertIcon, ReceiptIcon } from '@/components/ui/Icons';
+import { statusLabel } from '@/lib/pricing';
 
 const SOURCE_LABEL: Record<PaymentLog['source'], string> = {
   CREATE: 'Tạo link',
@@ -76,7 +77,7 @@ function PaymentDetailModal({ id, onClose }: { id: string | null; onClose: () =>
 
           <dl className="mt-4 divide-y divide-roast/10 rounded-2xl bg-cream px-4 py-2 text-sm">
             <Row label="Phương thức" value={methodName(p.method)} />
-            <Row label="Đơn hàng" value={`#${p.order.id} (${p.order.status})`} />
+            <Row label="Đơn hàng" value={`#${p.order.id} (${statusLabel(p.order.status).toLowerCase()})`} />
             <Row label="Tạo lúc" value={formatDateTime(p.createdAt)} />
             {p.method === 'VNPAY' && (
               <>

@@ -167,7 +167,7 @@ export default function OrderTracking({ orderId }: { orderId: string }) {
           <h2 id="progress-title" className="text-xl font-extrabold">
             {statusLabel(order.status, order.fulfillment)}
           </h2>
-          <code className="rounded-lg bg-cream px-2 py-1 text-xs font-bold text-roast/70">{order.status}</code>
+          <span className="stamp text-gold">{statusLabel(order.status, order.fulfillment)}</span>
         </div>
         <p className="mt-1 text-roast/70" aria-live="polite">
           {message[order.status]}

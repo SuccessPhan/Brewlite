@@ -9,18 +9,15 @@ import { useAuth } from '@/context/auth-context';
 import { ApiError } from '@/lib/api';
 import { REWARDS } from '@/lib/mock-data';
 import { formatDateTime, formatNumber, formatVnd } from '@/lib/format';
-import { tierOf } from '@/lib/pricing';
+import { statusLabel, tierOf } from '@/lib/pricing';
 import { useMyOrders } from '@/lib/use-orders';
 import type { Level, Order, SizeId, User } from '@/lib/types';
-import BackendStatus from '@/components/layout/BackendStatus';
 import { initialsOf } from '@/components/layout/UserMenu';
 import InvoiceModal from '@/components/orders/InvoiceModal';
 import RecentPayments from '@/components/payment/RecentPayments';
 import Skeleton from '@/components/ui/Skeleton';
 import Toast from '@/components/ui/Toast';
 import { LogoutIcon } from '@/components/ui/Icons';
-
-const TIER_STYLE = { Silver: 'bg-foam/20 text-foam', Gold: 'bg-gold text-roast', Platinum: 'bg-foam text-roast' } as const;
 
 export default function AccountView() {
   const router = useRouter();
@@ -67,33 +64,32 @@ export default function AccountView() {
 
   return (
     <>
-      {/* Thẻ thành viên */}
-      <section className="relative mt-6 animate-rise overflow-hidden rounded-[2rem] bg-gradient-to-br from-espresso via-[#5a3e2c] to-roast p-6 text-foam shadow-[0_30px_60px_-30px_rgba(59,42,32,.8)] sm:p-8">
-        <svg className="pointer-events-none absolute -right-10 -top-10 h-56 w-56 text-foam/5" viewBox="0 0 100 100" aria-hidden="true">
-          <circle cx="50" cy="50" r="48" fill="currentColor" />
-        </svg>
-        <div className="relative flex flex-wrap items-center gap-4">
-          <span className="grid h-16 w-16 shrink-0 place-items-center rounded-full bg-foam text-xl font-extrabold text-espresso">{initialsOf(user.fullName)}</span>
+      {/* Thẻ hội viên: in như thẻ báo dài hạn, viền đôi, số điểm chữ máy đánh */}
+      <section className="relative mt-6 animate-rise border-[3px] border-double border-roast bg-foam p-6 sm:p-8">
+        <div className="flex flex-wrap items-center gap-4">
+          <span className="grid h-16 w-16 shrink-0 place-items-center border-2 border-roast font-display text-2xl font-black">{initialsOf(user.fullName)}</span>
           <div className="min-w-0">
-            <p className="text-xl font-extrabold">{user.fullName}</p>
-            <p className="truncate text-sm text-foam/70">{user.email}</p>
-            <p className="text-xs text-foam/55">Thành viên từ {memberSince}</p>
+            <p className="kicker">Thẻ hội viên BrewLite</p>
+            <p className="font-display text-2xl font-black leading-tight">{user.fullName}</p>
+            <p className="truncate text-sm text-roast/70">
+              {user.email} · thành viên từ {memberSince}
+            </p>
           </div>
-          <span className={`ml-auto rounded-full px-3 py-1 text-sm font-bold ${TIER_STYLE[tier.name]}`}>Hạng {tier.name}</span>
+          <span className="stamp ml-auto text-sm text-gold">Hạng {tier.name}</span>
         </div>
-        <div className="relative mt-8 flex flex-wrap items-end justify-between gap-4">
+        <div className="mt-6 flex flex-wrap items-end justify-between gap-4 border-t border-roast pt-4">
           <div>
-            <p className="text-sm text-foam/70">Điểm BrewLite</p>
-            <p className="text-5xl font-extrabold tabular-nums tracking-tight">{formatNumber(user.points)}</p>
+            <p className="font-label text-xs uppercase tracking-wider text-roast/60">Điểm hiện có</p>
+            <p className="text-5xl font-semibold tabular-nums tracking-tight">{formatNumber(user.points)}</p>
           </div>
-          <p className="text-right text-sm text-foam/75">Tương đương {formatVnd(user.points * 100)} khi thanh toán</p>
+          <p className="text-right text-sm text-roast/75">Tương đương {formatVnd(user.points * 100)} khi thanh toán</p>
         </div>
         {tier.next && (
-          <div className="relative">
-            <div className="mt-5 h-2 overflow-hidden rounded-full bg-foam/15">
-              <div className="h-full rounded-full bg-gold transition-[width] duration-700" style={{ width: `${Math.min(100, (user.points / tier.next) * 100)}%` }} />
+          <div>
+            <div className="mt-4 h-2 border border-roast">
+              <div className="h-full bg-gold transition-[width] duration-700" style={{ width: `${Math.min(100, (user.points / tier.next) * 100)}%` }} />
             </div>
-            <p className="mt-2 text-sm text-foam/75">
+            <p className="mt-2 text-sm text-roast/75">
               Còn {formatNumber(tier.next - user.points)} điểm để lên hạng {tier.name === 'Silver' ? 'Gold' : 'Platinum'}.
             </p>
           </div>
@@ -138,7 +134,7 @@ export default function AccountView() {
                     <span className="font-semibold tabular-nums">{formatVnd(o.total)}</span>
                   </div>
                   <p className="text-xs text-roast/55">
-                    {formatDateTime(o.createdAt)}, {o.items.reduce((n, i) => n + i.qty, 0)} món, {o.status}
+                    {formatDateTime(o.createdAt)}, {o.items.reduce((n, i) => n + i.qty, 0)} món, {statusLabel(o.status, o.fulfillment).toLowerCase()}
                   </p>
                   <div className="mt-2 flex gap-4 text-sm font-semibold">
                     <button type="button" onClick={() => setInvoice(o)} className="text-espresso underline underline-offset-4">
@@ -200,24 +196,18 @@ export default function AccountView() {
         </section>
       </div>
 
-      <section className="mt-6 flex flex-wrap items-center justify-between gap-4 rounded-3xl bg-foam p-5 sm:p-6">
-        <div>
-          <h2 className="text-lg font-extrabold">Kết nối máy chủ</h2>
-          <div className="mt-1">
-            <BackendStatus />
-          </div>
-        </div>
+      <div className="mt-8 flex justify-end">
         <button
           type="button"
           onClick={() => {
             logout();
             router.push('/');
           }}
-          className="inline-flex h-11 items-center gap-2 rounded-full border-2 border-chili/40 px-5 font-semibold text-chili hover:bg-chili/10"
+          className="inline-flex h-11 items-center gap-2 border-2 border-chili px-5 font-semibold text-chili hover:bg-chili hover:text-foam"
         >
           <LogoutIcon /> Đăng xuất
         </button>
-      </section>
+      </div>
 
       <InvoiceModal order={invoice} onClose={() => setInvoice(null)} />
       <Toast message={toast} onDone={() => setToast(null)} />

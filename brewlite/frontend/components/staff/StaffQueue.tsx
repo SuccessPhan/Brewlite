@@ -137,10 +137,10 @@ export default function StaffQueue() {
         {COLUMNS.map((col) => {
           const list = orders.filter((o) => o.status === col.status);
           return (
-            <section key={col.status} className="rounded-3xl bg-cream p-3" aria-label={col.title}>
-              <h2 className="flex items-center justify-between px-2 py-1 font-bold">
+            <section key={col.status} className="border-t-[3px] border-double border-roast pt-2" aria-label={col.title}>
+              <h2 className="flex items-center justify-between py-1 text-xl font-black">
                 {col.title}
-                <span className="rounded-full bg-foam px-2.5 py-0.5 text-sm tabular-nums">{list.length}</span>
+                <span className="tabular-nums text-base text-gold">{String(list.length).padStart(2, "0")}</span>
               </h2>
               <ul className="mt-2 space-y-3">
                 {list.map((o) => (

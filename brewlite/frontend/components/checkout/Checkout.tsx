@@ -17,7 +17,7 @@ import { useAuth } from '@/context/auth-context';
 import { ApiError } from '@/lib/api';
 import { PAYMENT_METHODS, STORE } from '@/lib/mock-data';
 import { describeOptions, formatNumber, formatVnd } from '@/lib/format';
-import { DELIVERY_FEE, POINT_VALUE, VOUCHER_HINT, applyVoucher, pointsEarnedFor } from '@/lib/pricing';
+import { DELIVERY_FEE, POINT_VALUE, VOUCHER_HINT, applyVoucher, pointsEarnedFor, statusLabel } from '@/lib/pricing';
 import { PRODUCTS_KEY, useProductMap } from '@/lib/products';
 import type { Fulfillment, Order, PaymentMethodId, PaymentResult } from '@/lib/types';
 import ProductArt from '@/components/menu/ProductArt';
@@ -546,7 +546,7 @@ export default function Checkout() {
             </h2>
             <p className="mt-2 text-sm text-roast/65">
               Mã đơn <b className="text-roast">#{pay.order.id}</b>, trạng thái{' '}
-              <span className="rounded-full bg-leaf/15 px-2 py-0.5 text-xs font-bold text-leaf">{pay.order.status}</span>
+              <span className="stamp text-leaf">{statusLabel(pay.order.status, pay.order.fulfillment)}</span>
             </p>
             {pay.order.fulfillment === 'PICKUP' ? (
               <div className="mt-5 rounded-2xl bg-cream px-4 py-4 text-sm">
@@ -585,7 +585,7 @@ export default function Checkout() {
             {pay.order && (
               <p className="mt-2 text-sm">
                 Đơn <b>#{pay.order.id}</b>:{' '}
-                <span className="rounded-full bg-chili/10 px-2 py-0.5 text-xs font-bold text-chili">{pay.order.status}</span>
+                <span className="stamp text-chili">{statusLabel(pay.order.status, pay.order.fulfillment)}</span>
               </p>
             )}
             <p className="mt-2 text-sm leading-relaxed text-roast/70">
