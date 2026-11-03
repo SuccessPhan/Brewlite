@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import Article from '@/components/layout/Article';
-import { AUTH_IMAGE, photo } from '@/lib/images';
+import { STORY_IMAGE, photo } from '@/lib/images';
 import { STORE } from '@/lib/mock-data';
 
 export const metadata: Metadata = { title: 'Câu chuyện – BrewLite', description: 'Quầy cà phê nhỏ ở góc An Dương Vương, nhưng cái tâm thì không nhỏ: từ hạt rang mộc tới ly pha phin.' };
@@ -35,7 +35,7 @@ export default function StoryPage() {
   return (
     <Article kicker="Câu chuyện" title="Quầy cà phê nhỏ, nhưng cái tâm thì không nhỏ" lead="Sáng nào cũng có một hàng dài người đứng chờ gọi món. Chúng tôi muốn bạn khỏi phải chờ.">
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={photo(AUTH_IMAGE, 1200)} alt="Barista rót sữa vào ly cà phê" className="newsprint aspect-[21/9] w-full object-cover" />
+      <img src={photo(STORY_IMAGE, 1400)} alt="Bạn pha chế chăm chú rót nước pha cà phê ở quầy" className="newsprint aspect-[21/9] w-full object-cover" />
       <div className="mt-6 gap-8 sm:columns-2">
         <p className="first-letter:float-left first-letter:mr-2 first-letter:font-display first-letter:text-6xl first-letter:font-black first-letter:leading-[0.8]">
           BrewLite mở cửa từ 6 giờ 30 sáng ở {STORE.address}. Cà phê pha phin từ hạt robusta rang mộc, cà phê máy từ arabica, cùng trà trái cây và bánh nướng mỗi sáng.

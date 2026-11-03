@@ -11,3 +11,4 @@ export function sized(url: string, width = 800): string {
 
 export const HERO_IMAGE = '1571851534298-1ffa72eab79e'; // quán cà phê kiểu Sài Gòn xưa: bàn ghế gỗ, sàn gạch bông
 export const AUTH_IMAGE = '1514066558159-fc8c737ef259'; // rót sữa vào cà phê
+export const STORY_IMAGE = '1541437971345-e3a6af6cb491'; // bạn pha chế chăm chú rót nước pha cà phê
