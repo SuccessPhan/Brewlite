@@ -7,7 +7,7 @@ import { OrdersService } from '../orders/orders.service';
 /** API của quầy pha chế: nhân viên quầy và quản lý gọi được (khách gọi nhận 403) */
 @Controller('staff/orders')
 @UseGuards(JwtAuthGuard, RolesGuard)
-@Roles('STAFF', 'MANAGER')
+@Roles('STAFF')
 export class StaffController {
   constructor(private readonly orders: OrdersService) {}
 

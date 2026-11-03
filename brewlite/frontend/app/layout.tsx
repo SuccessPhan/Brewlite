@@ -6,6 +6,7 @@ import { AuthProvider } from '@/context/auth-context';
 import AppHeader from '@/components/layout/AppHeader';
 import BottomNav from '@/components/layout/BottomNav';
 import QueryProvider from '@/components/layout/QueryProvider';
+import SiteChrome from '@/components/layout/SiteChrome';
 import SiteFooter from '@/components/layout/SiteFooter';
 import { ProductSheetProvider } from '@/components/product/ProductSheetProvider';
 import './globals.css';
@@ -34,10 +35,17 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
           <AuthProvider>
             <AppStoreProvider>
               <ProductSheetProvider>
-                <AppHeader />
-                {children}
-                <SiteFooter />
-                <BottomNav />
+                <SiteChrome
+                  header={<AppHeader />}
+                  footer={
+                    <>
+                      <SiteFooter />
+                      <BottomNav />
+                    </>
+                  }
+                >
+                  {children}
+                </SiteChrome>
               </ProductSheetProvider>
             </AppStoreProvider>
           </AuthProvider>

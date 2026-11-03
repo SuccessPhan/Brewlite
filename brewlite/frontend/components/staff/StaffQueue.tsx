@@ -48,7 +48,7 @@ function OrderCard({ order, action, busy, onAdvance }: { order: StaffOrder; acti
 
 export default function StaffQueue() {
   const { user, request } = useAuth();
-  const isStaff = user?.role === 'STAFF' || user?.role === 'MANAGER';
+  const isStaff = user?.role === 'STAFF';
   const [orders, setOrders] = useState<StaffOrder[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);

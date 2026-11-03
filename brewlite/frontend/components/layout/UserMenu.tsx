@@ -62,8 +62,8 @@ export default function UserMenu() {
                   <ReceiptIcon /> Quản lý kho
                 </Link>
               )}
-              {(user.role === 'STAFF' || user.role === 'MANAGER') && (
-                <Link href="/staff" onClick={() => setOpen(false)} className={`flex items-center gap-3 rounded-xl px-3 py-2.5 ${user.role === 'STAFF' ? 'bg-gold/15 hover:bg-gold/25' : 'hover:bg-cream'}`}>
+              {user.role === 'STAFF' && (
+                <Link href="/staff" onClick={() => setOpen(false)} className="flex items-center gap-3 rounded-xl bg-gold/15 px-3 py-2.5 hover:bg-gold/25">
                   <CupIcon /> Quầy pha chế
                 </Link>
               )}

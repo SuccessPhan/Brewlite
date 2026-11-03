@@ -98,7 +98,7 @@ npm install
 npm run dev                                  # http://localhost:3000
 ```
 
-**Tài khoản demo:** khách `demo@brewlite.vn` / `Brewlite123` (có sẵn 1.250 điểm); nhân viên quầy `staff@brewlite.vn` / `Brewlite123`; quản lý cửa hàng `manager@brewlite.vn` / `Brewlite123` (vào **Quản lý kho**: tổng quan, nguyên liệu, nhập kho, kiểm kho, công thức, nhà cung cấp; hiện chạy bằng dữ liệu kho mẫu trên trình duyệt, API kho làm sau).
+**Tài khoản demo:** khách `demo@brewlite.vn` / `Brewlite123` (có sẵn 1.250 điểm); nhân viên quầy `staff@brewlite.vn` / `Brewlite123`; quản lý cửa hàng `manager@brewlite.vn` / `Brewlite123`. Nhân viên và quản lý đăng nhập ở trang riêng `/noi-bo/dang-nhap` và mỗi vai trò chỉ vào khu của mình: nhân viên ở **Quầy pha chế**, quản lý ở **Quản lý kho** ( tổng quan, nguyên liệu, nhập kho, kiểm kho, công thức, nhà cung cấp; hiện chạy bằng dữ liệu kho mẫu trên trình duyệt, API kho làm sau).
 
 **Thẻ test VNPay sandbox** (VNPay công bố cho môi trường thử, không phải thẻ thật):
 
@@ -122,7 +122,7 @@ Trên trang VNPay chọn **Thẻ nội địa và tài khoản ngân hàng → N
 8. Thử sửa `vnp_ResponseCode` trên thanh địa chỉ rồi tải lại trang → báo **chữ ký không hợp lệ**, không ghi nhận (chống giả mạo kết quả).
 9. Mở **Lịch sử giao dịch** (menu tài khoản hoặc trang Tài khoản → Xem tất cả): thấy 2 giao dịch (thất bại, thành công). Bấm vào giao dịch thành công: chi tiết + nhật ký trao đổi với VNPay; bấm **Kiểm tra lại với VNPay** để hỏi lại VNPay (API `querydr`).
 10. Đăng nhập trang quản trị merchant sandbox https://sandbox.vnpayment.vn/merchantv2/ (tài khoản trong email đăng ký) → **Tra cứu giao dịch**: thấy đúng giao dịch, đúng số tiền và mã `vnp_TxnRef` như trong BrewLite.
-11. **Theo dõi đơn hàng**: mã đơn để đọc tại quầy An Dương Vương. Mở cửa sổ ẩn danh, đăng nhập `staff@brewlite.vn`, vào menu tài khoản → **Quầy pha chế**: bấm *Bắt đầu pha* → *Pha xong* → *Đã giao khách*; trang theo dõi đơn của khách tự cập nhật PAID → PREPARING → READY → COMPLETED.
+11. **Theo dõi đơn hàng**: mã đơn để đọc tại quầy An Dương Vương. Mở cửa sổ ẩn danh, mở `/noi-bo/dang-nhap`, đăng nhập `staff@brewlite.vn` → vào thẳng **Quầy pha chế**: bấm *Bắt đầu pha* → *Pha xong* → *Đã giao khách*; trang theo dõi đơn của khách tự cập nhật PAID → PREPARING → READY → COMPLETED.
 12. Mở terminal chạy `npm run test` và `npm run test:int` trong `backend` để chứng minh Task 10 và việc xử lý kết quả VNPay.
 
 ## Product Backlog → mã nguồn

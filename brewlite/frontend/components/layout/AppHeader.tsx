@@ -53,7 +53,7 @@ export default function AppHeader() {
     return () => window.removeEventListener(CART_BUMP_EVENT, onBump);
   }, []);
 
-  // Nhân viên thấy thêm Quầy pha chế; quản lý thấy Quản lý kho (trong đó có lối sang quầy)
+  // Nhân viên thấy thêm Quầy pha chế; quản lý thấy Quản lý kho (mỗi vai trò một khu riêng)
   const links =
     user?.role === 'STAFF'
       ? [...NAV_LINKS, { href: '/staff', label: 'Quầy pha chế' }]

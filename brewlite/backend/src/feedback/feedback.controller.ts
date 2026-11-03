@@ -17,10 +17,10 @@ export class FeedbackController {
     return this.feedback.create(dto);
   }
 
-  /** GET /staff/feedback: nhân viên đọc góp ý mới nhất */
+  /** GET /staff/feedback: quản lý đọc góp ý mới nhất của khách */
   @Get('staff/feedback')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('STAFF', 'MANAGER')
+  @Roles('MANAGER')
   findLatest() {
     return this.feedback.findLatest();
   }
