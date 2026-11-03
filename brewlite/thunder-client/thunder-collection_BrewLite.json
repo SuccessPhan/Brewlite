@@ -114,10 +114,10 @@
       ]
     },
     {
-      "_id": "bd1a21b6-8588-5254-abe4-ee39877b81e5",
+      "_id": "cf62f0f4-e736-52aa-aa7f-12f0cd4bb418",
       "colId": "7aca99f7-a0f4-5f46-ad12-c95a3b8933db",
       "containerId": "e5f27e96-71bf-502e-9f41-48d7955ff2c3",
-      "name": "Đăng ký tài khoản mới (email ngẫu nhiên)",
+      "name": "Đăng ký khách mới, email ngẫu nhiên (lưu token, dùng cho các bước sau)",
       "url": "http://localhost:3001/auth/register",
       "method": "POST",
       "sortNum": 40000,
@@ -131,6 +131,12 @@
           "custom": "",
           "action": "equal",
           "value": "201"
+        },
+        {
+          "type": "set-env-var",
+          "custom": "json.accessToken",
+          "action": "setto",
+          "value": "{{token}}"
         }
       ],
       "body": {
@@ -140,10 +146,10 @@
       }
     },
     {
-      "_id": "59d12887-b9e5-5b69-9885-50083992a8c4",
+      "_id": "d5e066fa-7577-5236-ba45-c14463a7ec04",
       "colId": "7aca99f7-a0f4-5f46-ad12-c95a3b8933db",
       "containerId": "e5f27e96-71bf-502e-9f41-48d7955ff2c3",
-      "name": "Đăng nhập khách demo (lưu token)",
+      "name": "Đăng nhập khách demo",
       "url": "http://localhost:3001/auth/login",
       "method": "POST",
       "sortNum": 50000,
@@ -157,12 +163,6 @@
           "custom": "",
           "action": "equal",
           "value": "200"
-        },
-        {
-          "type": "set-env-var",
-          "custom": "json.accessToken",
-          "action": "setto",
-          "value": "{{token}}"
         }
       ],
       "body": {
@@ -927,10 +927,10 @@
       }
     },
     {
-      "_id": "da88e0b8-2619-5cb8-8cda-11d2c5c9ca78",
+      "_id": "2114eaaa-dce8-5071-9732-98f4d4c26ded",
       "colId": "7aca99f7-a0f4-5f46-ad12-c95a3b8933db",
       "containerId": "3de89dd3-fddc-5f87-9012-ff2bb738a1c5",
-      "name": "Đăng nhập sai mật khẩu: 401 (bấm 6 lần trong 1 phút sẽ thành 429)",
+      "name": "Đăng nhập sai mật khẩu: 401 (bấm 11 lần trong 1 phút sẽ thành 429)",
       "url": "http://localhost:3001/auth/login",
       "method": "POST",
       "sortNum": 330000,

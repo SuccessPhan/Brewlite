@@ -203,7 +203,7 @@ npm run test:int    # integration test trên PostgreSQL thật (cần docker com
 |---|---|---|
 | Mật khẩu | Băm bcrypt, không bao giờ trả `passwordHash` ra API; mật khẩu tối thiểu 8 ký tự, có chữ và số | `auth.service.ts` |
 | Đăng nhập | JWT ký bằng `JWT_SECRET`; khi chạy production, thiếu khoá, khoá dưới 32 ký tự hoặc khoá mẫu thì API không khởi động | `jwt.strategy.ts` |
-| Chống dò mật khẩu | Mỗi IP tối đa 5 lần/phút cho đăng nhập, đăng ký; 120 request/phút cho các API khác; vượt thì trả 429 | Thunder Client: bấm đăng nhập sai 6 lần |
+| Chống dò mật khẩu | Mỗi IP tối đa 10 lần/phút cho đăng nhập, đăng ký; 120 request/phút cho các API khác; vượt thì trả 429 | Thunder Client: bấm đăng nhập sai 11 lần trong 1 phút |
 | Phân quyền | `RolesGuard`: API quầy chỉ cho STAFF (403); vai trò đọc lại từ CSDL mỗi request; đăng ký trên web không tự gán vai trò được | `roles.guard.spec.ts`, Thunder mục 6 |
 | Dữ liệu của ai người nấy xem | Mọi truy vấn đơn, giao dịch đều lọc theo người đăng nhập; đơn người khác trả 404 | Thunder mục 6 |
 | Dữ liệu đầu vào | `ValidationPipe` với `whitelist` + `forbidNonWhitelisted`: trường lạ (giá, vai trò) bị từ chối 400; giá do backend tính từ CSDL | Thunder mục 6 |
@@ -220,8 +220,8 @@ Còn lại cần làm khi đưa lên mạng thật: chạy sau HTTPS, đổi m�
 
 1. Cài extension **Thunder Client** trong VS Code, chạy backend (`run-brewlite.bat` hoặc `npm run start:dev`).
 2. Thunder Client → tab **Collections** → nút menu ☰ → **Import** → chọn `brewlite/thunder-client/thunder-collection_BrewLite.json`.
-3. Chạy từng request theo thứ tự thư mục 1 → 6, hoặc chuột phải collection → **Run All**. Đăng nhập xong token tự lưu vào biến `{{token}}`, `{{staffToken}}`; tạo đơn xong mã đơn lưu vào `{{orderId}}`. Mỗi request có sẵn test mã trạng thái mong đợi.
-4. Thư mục **6. Bảo mật** là các ca phải bị chặn (401, 403, 404, 400). Request đăng nhập sai bấm liên tục 6 lần trong 1 phút sẽ nhận 429.
+3. Chạy từng request theo thứ tự thư mục 1 → 6, hoặc chuột phải collection → **Run All**. Request đăng ký tạo một khách mới (được tặng 1.250 điểm) và lưu token vào `{{token}}`, đăng nhập nhân viên lưu `{{staffToken}}`; tạo đơn xong mã đơn lưu vào `{{orderId}}`. Mỗi request có sẵn test mã trạng thái mong đợi.
+4. Thư mục **6. Bảo mật** là các ca phải bị chặn (401, 403, 404, 400). Request đăng nhập sai bấm liên tục 11 lần trong 1 phút sẽ nhận 429.
 
 ## API
 
