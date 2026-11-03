@@ -104,6 +104,8 @@ button, .font-label, label, nav a, th {
   letter-spacing: 0.04em;
 }
 button { text-transform: uppercase; }
+/* Nút là cả một dòng nội dung (dòng giao dịch...): giữ chữ thường như văn bản */
+.plain-btn { font-family: var(--font-serif); text-transform: none; letter-spacing: normal; }
 
 /* Giá tiền, mã đơn: chữ máy đánh chữ */
 .tabular-nums { font-family: var(--font-mono); }
