@@ -75,7 +75,11 @@ export default function Recipes() {
                         <Link href={`/quan-ly/nguyen-lieu?xem=${ing.id}`} className="hover:underline">
                           {ing.name}
                         </Link>
-                        {st !== 'ok' && <span className={`ml-2 font-label text-[10px] font-semibold uppercase tracking-wider ${st === 'out' ? 'text-chili' : 'text-amber-700'}`}>{st === 'out' ? 'hết' : 'sắp hết'}</span>}
+                        {st !== 'ok' && (
+                          <span className={`ml-2 font-label text-[10px] font-semibold uppercase tracking-wider ${st === 'out' ? 'text-chili' : 'text-amber-700'}`}>
+                            {st === 'out' ? 'hết' : 'sắp hết'}
+                          </span>
+                        )}
                       </td>
                       <td className="px-2 py-1.5 text-right font-mono text-xs">
                         {l.amount.toLocaleString('vi-VN')} {ing.sub}
@@ -93,7 +97,9 @@ export default function Recipes() {
               </div>
               <div className="border-l border-roast px-4 py-2.5">
                 <p className="font-label text-[10px] uppercase tracking-wider text-roast/55">Còn pha được</p>
-                <p className={`font-bold ${cups === 0 ? 'text-chili' : `font-mono ${cups < 30 ? 'text-amber-700' : ''}`}`}>{cups === 0 ? 'Hết, không pha được' : `~${cups.toLocaleString('vi-VN')} ly`}</p>
+                <p className={`font-bold ${cups === 0 ? 'text-chili' : `font-mono ${cups < 30 ? 'text-amber-700' : ''}`}`}>
+                  {cups === 0 ? 'Hết, không pha được' : `~${cups.toLocaleString('vi-VN')} ly`}
+                </p>
                 {limitBy && <p className="truncate text-[11px] text-roast/55">Hết trước: {limitBy.name}</p>}
               </div>
             </div>

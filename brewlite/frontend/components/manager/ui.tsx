@@ -8,7 +8,8 @@ import { CloseIcon } from '@/components/ui/Icons';
 
 export const btnSolid = 'inline-flex h-10 items-center justify-center gap-1.5 bg-gold px-4 font-label text-xs font-semibold uppercase tracking-wider text-foam hover:bg-gold-deep disabled:opacity-50';
 export const btnInk = 'inline-flex h-10 items-center justify-center gap-1.5 bg-roast px-4 font-label text-xs font-semibold uppercase tracking-wider text-cream hover:bg-espresso disabled:opacity-50';
-export const btnLine = 'inline-flex h-10 items-center justify-center gap-1.5 border-2 border-roast px-4 font-label text-xs font-semibold uppercase tracking-wider hover:bg-roast hover:text-cream disabled:opacity-50';
+export const btnLine =
+  'inline-flex h-10 items-center justify-center gap-1.5 border-2 border-roast px-4 font-label text-xs font-semibold uppercase tracking-wider hover:bg-roast hover:text-cream disabled:opacity-50';
 export const input = 'h-10 w-full border-2 border-roast/30 bg-cream px-3 text-sm focus:border-roast focus:outline-none';
 /** Ô chọn gọn theo nội dung, dùng trong hàng bộ lọc */
 export const select = 'h-10 border-2 border-roast/30 bg-cream px-3 text-sm focus:border-roast focus:outline-none';
@@ -59,7 +60,7 @@ export function StockBar({ stock, min }: { stock: number; min: number }) {
 }
 
 /** Khung trượt từ bên phải để xem chi tiết mà không rời trang */
-export function SidePanel({ open, title, onClose, children, footer }: { open: boolean; title: string; onClose: () => void; children: ReactNode; footer?: ReactNode }) {
+export function SidePanel({ open, title, onClose, children, footer, wide }: { open: boolean; title: string; onClose: () => void; children: ReactNode; footer?: ReactNode; wide?: boolean }) {
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
@@ -80,7 +81,7 @@ export function SidePanel({ open, title, onClose, children, footer }: { open: bo
         aria-modal="true"
         aria-label={title}
         onClick={(e) => e.stopPropagation()}
-        className="absolute inset-y-0 right-0 flex w-full max-w-lg flex-col border-l-[3px] border-double border-roast bg-cream"
+        className={`absolute inset-y-0 right-0 flex w-full flex-col ${wide ? 'max-w-4xl' : 'max-w-lg'} border-l-[3px] border-double border-roast bg-cream`}
       >
         <div className="flex items-center justify-between gap-3 border-b-2 border-roast px-5 py-4">
           <h2 className="font-display text-2xl font-black leading-tight">{title}</h2>
@@ -105,3 +106,33 @@ export function FieldLabel({ label, children, hint }: { label: string; children:
     </label>
   );
 }
+
+/** Công tắc bật/tắt (ẩn món, chạy mã, bật thông báo) */
+export function Toggle({ on, onChange, label, size = 'md' }: { on: boolean; onChange: (v: boolean) => void; label: string; size?: 'sm' | 'md' }) {
+  const box = size === 'sm' ? 'h-5 w-9' : 'h-6 w-11';
+  const knob = size === 'sm' ? 'h-3.5 w-3.5' : 'h-4 w-4';
+  const shift = size === 'sm' ? 'translate-x-4' : 'translate-x-5';
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={on}
+      aria-label={label}
+      onClick={(e) => {
+        e.stopPropagation();
+        onChange(!on);
+      }}
+      className={`relative inline-flex shrink-0 items-center border-2 border-roast transition-colors ${box} ${on ? 'bg-leaf' : 'bg-cream'}`}
+    >
+      <span className={`absolute left-0.5 transition-transform ${knob} ${on ? `${shift} bg-cream` : 'bg-roast'}`} />
+    </button>
+  );
+}
+
+/** Nhãn trạng thái nhỏ có viền */
+export function Chip({ tone = 'ink', children }: { tone?: 'ink' | 'ok' | 'warn' | 'bad' | 'mute'; children: ReactNode }) {
+  const cls = { ink: 'border-roast text-roast', ok: 'border-leaf text-leaf', warn: 'border-amber-700 text-amber-700', bad: 'border-chili text-chili', mute: 'border-roast/40 text-roast/55' }[tone];
+  return <span className={`inline-flex items-center whitespace-nowrap border px-1.5 py-px font-label text-[10px] font-semibold uppercase tracking-wider ${cls}`}>{children}</span>;
+}
+
+export const textarea = 'w-full border-2 border-roast/30 bg-cream px-3 py-2 text-sm leading-relaxed focus:border-roast focus:outline-none';

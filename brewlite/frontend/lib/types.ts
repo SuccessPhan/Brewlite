@@ -23,6 +23,8 @@ export interface Product {
   id: string;
   name: string;
   description: string;
+  /** Câu giới thiệu ngắn dưới tên món (quản lý tự đặt) */
+  tagline?: string;
   price: number;
   imageUrl: string;
   stock: number;

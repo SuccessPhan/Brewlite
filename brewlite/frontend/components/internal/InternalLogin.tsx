@@ -20,8 +20,8 @@ const AREAS = [
     who: 'Nhân viên quầy',
   },
   {
-    title: 'Quản lý kho',
-    text: 'Nguyên liệu, nhập kho, kiểm kho, công thức định lượng, nhà cung cấp.',
+    title: 'Quản lý cửa hàng',
+    text: 'Thực đơn, mã giảm giá, nội dung trang, phản hồi của khách và kho nguyên liệu.',
     who: 'Quản lý',
   },
 ];

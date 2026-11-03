@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { formatDateTime, formatVnd } from '@/lib/format';
+import { matchText } from '@/lib/search';
 import { GROUPS, MOVE_LABEL, qtyText, stateOf, suggestQty, useInventory, type GroupId, type Ingredient, type StockState } from '@/lib/inventory';
 import { useProductMap } from '@/lib/products';
 import Modal from '@/components/ui/Modal';
@@ -35,13 +36,19 @@ export default function Ingredients() {
   const [editing, setEditing] = useState<Ingredient | 'new' | null>(null);
   const [toast, setToast] = useState<string | null>(null);
 
+  // Mở từ ô tìm nhanh khi đang ở sẵn trang này
+  useEffect(() => {
+    const id = params.get('xem');
+    if (id) setOpenId(id);
+  }, [params]);
+
   const supplierName = (id: string) => suppliers.find((s) => s.id === id)?.name ?? '—';
   const rank: Record<StockState, number> = { out: 0, low: 1, ok: 2 };
 
   const list = useMemo(() => {
     const term = fold(q.trim());
     return ingredients
-      .filter((i) => (group === 'all' || i.group === group) && (!term || fold(i.name).includes(term)))
+      .filter((i) => (group === 'all' || i.group === group) && (!term || matchText(i.name, q) !== null || fold(i.name).includes(term)))
       .filter((i) => {
         const st = stateOf(i);
         return state === 'all' || (state === 'need' ? st !== 'ok' : st === state);
@@ -269,7 +276,10 @@ function IngredientPanel({ ingredient: i, onClose, onEdit, onToast }: { ingredie
       {mode === 'adjust' && (
         <form onSubmit={submitAdjust} className="mt-5 space-y-3 border-2 border-roast p-4">
           <p className="font-display text-lg font-bold">Điều chỉnh tồn kho</p>
-          <FieldLabel label={`Tồn mới (${i.unit})`} hint={newStock.trim() !== '' && Number.isFinite(parsed) ? `Chênh lệch ${parsed - i.stock >= 0 ? '+' : ''}${qtyText(Math.round((parsed - i.stock) * 1000) / 1000, i.unit)}` : undefined}>
+          <FieldLabel
+            label={`Tồn mới (${i.unit})`}
+            hint={newStock.trim() !== '' && Number.isFinite(parsed) ? `Chênh lệch ${parsed - i.stock >= 0 ? '+' : ''}${qtyText(Math.round((parsed - i.stock) * 1000) / 1000, i.unit)}` : undefined}
+          >
             <input inputMode="decimal" value={newStock} onChange={(e) => setNewStock(e.target.value)} className={input} />
           </FieldLabel>
           <FieldLabel label="Lý do">
@@ -362,7 +372,11 @@ function IngredientForm({ value, onClose, onSaved }: { value: Ingredient | 'new'
     if (name.length < 2) return setError('Nhập tên nguyên liệu.');
     if (!f.unit.trim() || !f.sub.trim() || !(f.per > 0)) return setError('Đơn vị và hệ số đổi phải hợp lệ.');
     if (!(f.min >= 0) || !(f.cost >= 0)) return setError('Mức tối thiểu và giá vốn không được âm.');
-    const id = isNew ? fold(name).replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') : f.id;
+    const id = isNew
+      ? fold(name)
+          .replace(/[^a-z0-9]+/g, '-')
+          .replace(/^-|-$/g, '')
+      : f.id;
     if (isNew && ingredients.some((i) => i.id === id)) return setError('Đã có nguyên liệu trùng tên.');
     saveIngredient({ ...f, id, name });
     onSaved(name);

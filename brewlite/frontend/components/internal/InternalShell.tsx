@@ -12,7 +12,7 @@ import { LockIcon, LogoutIcon } from '@/components/ui/Icons';
 
 const AREAS = [
   { href: '/staff', label: 'Quầy pha chế', roles: ['STAFF'] },
-  { href: '/quan-ly', label: 'Quản lý kho', roles: ['MANAGER'] },
+  { href: '/quan-ly', label: 'Quản lý cửa hàng', roles: ['MANAGER'] },
 ];
 
 export default function InternalShell({ children }: { children: ReactNode }) {
@@ -114,7 +114,7 @@ export default function InternalShell({ children }: { children: ReactNode }) {
           <p className="mt-2 text-sm text-roast/70">
             {user.role === 'CUSTOMER'
               ? 'Bạn đang đăng nhập bằng tài khoản khách hàng. Nhân viên đăng nhập bằng tài khoản được cửa hàng cấp.'
-              : 'Mỗi vai trò làm việc ở khu riêng: nhân viên ở Quầy pha chế, quản lý ở Quản lý kho. Tài khoản của bạn không có quyền vào khu này.'}
+              : 'Mỗi vai trò làm việc ở khu riêng: nhân viên ở Quầy pha chế, quản lý ở Quản lý cửa hàng. Tài khoản của bạn không có quyền vào khu này.'}
           </p>
           <div className="mt-5 flex flex-wrap justify-center gap-2">
             {user.role === 'CUSTOMER' ? (

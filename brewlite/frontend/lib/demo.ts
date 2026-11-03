@@ -10,6 +10,6 @@ export const DEMO_PASSWORD = 'Brewlite123';
 export const DEMO_CUSTOMERS: DemoAccount[] = [{ email: 'demo@brewlite.vn', name: 'Nguyễn Minh Anh', initials: 'MA', role: 'Khách quen', note: 'Có sẵn đơn, giao dịch và điểm thưởng' }];
 
 export const DEMO_INTERNAL: DemoAccount[] = [
-  { email: 'manager@brewlite.vn', name: 'Quản lý cửa hàng', initials: 'QL', role: 'Quản lý', note: 'Kho nguyên liệu, nhập hàng, kiểm kho, công thức' },
+  { email: 'manager@brewlite.vn', name: 'Quản lý cửa hàng', initials: 'QL', role: 'Quản lý', note: 'Thực đơn, mã giảm giá, phản hồi, kho' },
   { email: 'staff@brewlite.vn', name: 'Nhân viên quầy', initials: 'NV', role: 'Nhân viên', note: 'Hàng đợi pha chế, chuyển bước đơn' },
 ];

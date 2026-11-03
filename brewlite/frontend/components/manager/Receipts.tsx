@@ -32,9 +32,7 @@ export default function Receipts() {
 
   const supplierName = (id: string) => suppliers.find((s) => s.id === id)?.name ?? '—';
   const list = receipts.filter((r) => r.status === tab).sort((a, b) => b.at.localeCompare(a.at));
-  const monthTotal = receipts
-    .filter((r) => r.status === 'done' && new Date(r.at).getMonth() === new Date().getMonth())
-    .reduce((n, r) => n + receiptTotal(r), 0);
+  const monthTotal = receipts.filter((r) => r.status === 'done' && new Date(r.at).getMonth() === new Date().getMonth()).reduce((n, r) => n + receiptTotal(r), 0);
 
   return (
     <>
@@ -229,7 +227,11 @@ function ReceiptForm({ init, onClose, onDone }: { init: { receipt?: Receipt; sup
       </div>
 
       {needing.length > 0 && (
-        <button type="button" onClick={() => setLines((ls) => [...ls, ...needing.map((i) => lineOf(i.id))])} className="mt-4 w-full border-2 border-dashed border-gold px-3 py-2 text-left text-sm hover:bg-gold/10">
+        <button
+          type="button"
+          onClick={() => setLines((ls) => [...ls, ...needing.map((i) => lineOf(i.id))])}
+          className="mt-4 w-full border-2 border-dashed border-gold px-3 py-2 text-left text-sm hover:bg-gold/10"
+        >
           <b className="text-amber-700">+ Thêm {needing.length} món sắp hết</b> của nhà cung cấp này: {needing.map((i) => i.name).join(', ')}
         </button>
       )}
@@ -256,16 +258,37 @@ function ReceiptForm({ init, onClose, onDone }: { init: { receipt?: Receipt; sup
                   </td>
                   <td className="py-2 pr-2">
                     <span className="flex items-center gap-1">
-                      <input type="number" min={0} step="any" value={l.qty} onChange={(e) => update(l.key, { qty: Number(e.target.value) })} className={`${input} px-2`} aria-label={`Số lượng ${ing?.name}`} />
+                      <input
+                        type="number"
+                        min={0}
+                        step="any"
+                        value={l.qty}
+                        onChange={(e) => update(l.key, { qty: Number(e.target.value) })}
+                        className={`${input} px-2`}
+                        aria-label={`Số lượng ${ing?.name}`}
+                      />
                       <span className="text-xs text-roast/60">{ing?.unit}</span>
                     </span>
                   </td>
                   <td className="py-2 pr-2">
-                    <input type="number" min={0} step={100} value={l.price} onChange={(e) => update(l.key, { price: Number(e.target.value) })} className={`${input} px-2`} aria-label={`Đơn giá ${ing?.name}`} />
+                    <input
+                      type="number"
+                      min={0}
+                      step={100}
+                      value={l.price}
+                      onChange={(e) => update(l.key, { price: Number(e.target.value) })}
+                      className={`${input} px-2`}
+                      aria-label={`Đơn giá ${ing?.name}`}
+                    />
                   </td>
                   <td className="py-2 text-right font-mono">{formatVnd((l.qty || 0) * (l.price || 0))}</td>
                   <td className="py-2 text-right">
-                    <button type="button" onClick={() => setLines((ls) => ls.filter((x) => x.key !== l.key))} aria-label={`Bỏ ${ing?.name}`} className="grid h-8 w-8 place-items-center text-roast/50 hover:text-chili">
+                    <button
+                      type="button"
+                      onClick={() => setLines((ls) => ls.filter((x) => x.key !== l.key))}
+                      aria-label={`Bỏ ${ing?.name}`}
+                      className="grid h-8 w-8 place-items-center text-roast/50 hover:text-chili"
+                    >
                       <TrashIcon className="h-4 w-4" />
                     </button>
                   </td>
@@ -277,12 +300,7 @@ function ReceiptForm({ init, onClose, onDone }: { init: { receipt?: Receipt; sup
       </div>
 
       <div className="mt-3">
-        <select
-          value=""
-          onChange={(e) => e.target.value && setLines((ls) => [...ls, lineOf(e.target.value)])}
-          className={`${input} w-full sm:w-auto`}
-          aria-label="Thêm mặt hàng"
-        >
+        <select value="" onChange={(e) => e.target.value && setLines((ls) => [...ls, lineOf(e.target.value)])} className={`${input} w-full sm:w-auto`} aria-label="Thêm mặt hàng">
           <option value="">+ Thêm mặt hàng khác…</option>
           {others.map((i) => (
             <option key={i.id} value={i.id}>

@@ -3,8 +3,16 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAppStore } from '@/context/app-store';
-import { useAuth } from '@/context/auth-context';
-import { BagIcon, CupIcon, HomeIcon, ReceiptIcon, UserIcon } from '@/components/ui/Icons';
+import { useManagerPreview } from '@/lib/preview';
+import { BagIcon, CupIcon, HomeIcon, LockIcon, ReceiptIcon, UserIcon, WalletIcon } from '@/components/ui/Icons';
+
+// Quản lý đang xem trang khách: bỏ giỏ hàng, đơn, tài khoản; thêm nút về trang quản lý
+const PREVIEW_ITEMS = [
+  { href: '/', label: 'Trang nhất', Icon: HomeIcon },
+  { href: '/menu', label: 'Thực đơn', Icon: CupIcon },
+  { href: '/uu-dai', label: 'Ưu đãi', Icon: WalletIcon },
+  { href: '/quan-ly', label: 'Quản lý', Icon: LockIcon },
+];
 
 const ITEMS = [
   { href: '/', label: 'Trang nhất', Icon: HomeIcon },
@@ -18,16 +26,14 @@ const ITEMS = [
 export default function BottomNav() {
   const pathname = usePathname();
   const { cartCount, hydrated } = useAppStore();
-  const { user } = useAuth();
+  const preview = useManagerPreview();
   if (pathname.startsWith('/product') || pathname.startsWith('/checkout')) return null;
 
-  // Nhân viên: ô "Đơn hàng" đổi thành "Quầy"; quản lý: đổi thành "Kho"
-  const swap = user?.role === 'STAFF' ? { href: '/staff', label: 'Quầy' } : user?.role === 'MANAGER' ? { href: '/quan-ly', label: 'Kho' } : null;
-  const items = swap ? ITEMS.map((i) => (i.href === '/orders' ? { ...i, ...swap } : i)) : ITEMS;
+  const items = preview ? PREVIEW_ITEMS : ITEMS;
 
   return (
     <nav aria-label="Điều hướng chính" className="fixed inset-x-0 bottom-0 z-30 border-t-[3px] border-double border-roast bg-cream pb-[env(safe-area-inset-bottom)] md:hidden">
-      <ul className="grid grid-cols-5">
+      <ul className={`grid ${preview ? 'grid-cols-4' : 'grid-cols-5'}`}>
         {items.map(({ href, label, Icon }) => {
           const active = href === '/' ? pathname === '/' : pathname.startsWith(href);
           return (

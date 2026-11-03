@@ -31,3 +31,9 @@ export function formatClock(ts: number | string): string {
 export function formatDateTime(ts: number | string): string {
   return new Date(ts).toLocaleString('vi-VN', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit', year: 'numeric' });
 }
+
+/** "2026-11-30" hoặc mốc thời gian -> "30/11/2026" */
+export function formatDate(value: string | number): string {
+  const d = typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value) ? new Date(`${value}T00:00:00`) : new Date(value);
+  return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
+}

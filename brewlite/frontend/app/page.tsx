@@ -2,7 +2,7 @@ import Link from 'next/link';
 import HomeSidebar from '@/components/home/HomeSidebar';
 import BestSellerRail from '@/components/menu/BestSellerRail';
 import CategoryShelf from '@/components/menu/CategoryShelf';
-import { HERO_IMAGE, photo } from '@/lib/images';
+import HomeHero from '@/components/home/HomeHero';
 import { BellIcon, CupIcon, WalletIcon } from '@/components/ui/Icons';
 
 const STEPS = [
@@ -17,18 +17,7 @@ export default function HomePage() {
       {/* Trang nhất: bài chính bên trái, cột giá bên phải, cách nhau bằng đường kẻ dọc */}
       <section className="grid gap-6 lg:grid-cols-[1fr_20rem] lg:gap-0">
         <article className="lg:border-r lg:border-roast lg:pr-8">
-          <p className="kicker">Cà phê kiểu Sài Gòn xưa</p>
-          <h1 className="mt-2 text-4xl font-black leading-[1.02] sm:text-6xl">Ly phin chậm rãi ngày xưa, nay đặt trước khỏi chờ</h1>
-          <figure className="mt-5">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={photo(HERO_IMAGE, 1400)} alt="Góc quán với bàn ghế gỗ, ghế đệm và sàn gạch bông" className="newsprint aspect-[16/9] w-full object-cover" fetchPriority="high" />
-            <figcaption className="mt-2 border-b border-roast pb-3 font-serif text-lg italic leading-snug text-roast/80">
-              Bàn gỗ, ghế đệm, sàn gạch bông và tiếng phin nhỏ giọt, như một quán quen của Sài Gòn những năm 80.
-            </figcaption>
-          </figure>
-          <p className="mt-4 max-w-2xl text-[17px] leading-relaxed first-letter:float-left first-letter:mr-2 first-letter:font-display first-letter:text-6xl first-letter:font-black first-letter:leading-[0.8]">
-            Đặt món trên điện thoại trước khi ra khỏi nhà, tới quầy là có ly. Mỗi 1.000đ bạn được tích 1 điểm, dùng để đổi bánh, nâng size hoặc trừ thẳng vào đơn sau.
-          </p>
+          <HomeHero />
           <div className="mt-6 flex flex-wrap gap-3">
             <Link href="/menu" className="inline-flex h-12 items-center bg-gold px-7 font-label text-sm font-semibold uppercase tracking-wider text-foam hover:bg-gold-deep">
               Đặt món ngay

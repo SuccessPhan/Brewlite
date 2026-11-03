@@ -107,6 +107,15 @@ button { text-transform: uppercase; }
 /* Nút là cả một dòng nội dung (dòng giao dịch...): giữ chữ thường như văn bản */
 .plain-btn { font-family: var(--font-serif); text-transform: none; letter-spacing: normal; }
 
+/* Ô nhập nằm trong thẻ label không thừa hưởng chữ hẹp in hoa của nhãn */
+label input,
+label textarea,
+label select {
+  font-family: var(--font-serif);
+  letter-spacing: normal;
+  text-transform: none;
+}
+
 /* Ô nhập được trình duyệt tự điền: giữ nền giấy thay cho nền xanh mặc định */
 input:-webkit-autofill,
 input:-webkit-autofill:hover,

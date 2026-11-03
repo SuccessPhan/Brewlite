@@ -8,15 +8,10 @@ import { useAuth } from '@/context/auth-context';
 import { formatNumber } from '@/lib/format';
 import { REWARDS } from '@/lib/mock-data';
 import { useRedeem } from '@/lib/redeem';
+import { useManagerPreview } from '@/lib/preview';
+import { useStorefront, voucherState } from '@/lib/storefront';
 import Toast from '@/components/ui/Toast';
 import { CheckIcon, CopyIcon } from '@/components/ui/Icons';
-
-// Khớp với bảng Voucher ở backend (src/seed.ts) và luật trong lib/pricing.ts
-const VOUCHERS = [
-  { code: 'VNPAY20', title: 'Giảm 20% khi trả qua VNPay', terms: 'Tối đa 25.000đ. Chỉ áp dụng khi chọn thanh toán VNPay.' },
-  { code: 'BREW20', title: 'Giảm 20% cho đơn từ 50.000đ', terms: 'Tối đa 20.000đ. Áp dụng mọi phương thức thanh toán.' },
-  { code: 'FREESHIP', title: 'Miễn phí giao hàng', terms: 'Áp dụng khi chọn giao tận nơi, phí giao thường là 15.000đ.' },
-];
 
 const btn = 'inline-flex h-10 items-center justify-center gap-1.5 px-4 font-label text-xs font-semibold uppercase tracking-wider transition-colors';
 
@@ -33,6 +28,10 @@ export default function DealsView() {
 
 function Vouchers({ onToast }: { onToast: (m: string) => void }) {
   const { savedVoucher, setSavedVoucher, hydrated, cartCount } = useAppStore();
+  // Mã do quản lý đặt ở khu Quản lý > Mã giảm giá: chỉ hiện mã đang chạy và được bật "hiện trên trang Ưu đãi"
+  const all = useStorefront((s) => s.vouchers);
+  const VOUCHERS = all.filter((v) => v.showOnSite && voucherState(v) === 'running');
+  const preview = useManagerPreview();
 
   async function copy(code: string) {
     try {
@@ -48,6 +47,9 @@ function Vouchers({ onToast }: { onToast: (m: string) => void }) {
       <h2 id="vouchers-title" className="sr-only">
         Mã giảm giá
       </h2>
+      {VOUCHERS.length === 0 && (
+        <p className="border-2 border-dashed border-roast/40 px-4 py-8 text-center text-roast/65">Hiện chưa có mã giảm giá nào. Quay lại sau nhé, quán thường có mã mới mỗi tuần.</p>
+      )}
       <ul className="grid gap-4 sm:grid-cols-3">
         {VOUCHERS.map((v) => {
           const saved = hydrated && savedVoucher === v.code;
@@ -55,13 +57,18 @@ function Vouchers({ onToast }: { onToast: (m: string) => void }) {
             <li key={v.code} className={`flex flex-col border-2 border-dashed p-4 ${saved ? 'border-gold' : 'border-roast'}`}>
               <div className="flex items-center justify-between gap-2">
                 <p className="stamp text-gold">{v.code}</p>
-                <button type="button" onClick={() => copy(v.code)} className="inline-flex items-center gap-1 text-xs font-semibold underline-offset-4 hover:text-gold hover:underline" aria-label={`Chép mã ${v.code}`}>
+                <button
+                  type="button"
+                  onClick={() => copy(v.code)}
+                  className="inline-flex items-center gap-1 text-xs font-semibold underline-offset-4 hover:text-gold hover:underline"
+                  aria-label={`Chép mã ${v.code}`}
+                >
                   <CopyIcon className="h-4 w-4" /> Chép
                 </button>
               </div>
               <h3 className="mt-3 text-xl font-bold leading-tight">{v.title}</h3>
               <p className="mt-2 text-sm text-roast/75">{v.terms}</p>
-              <div className="mt-auto pt-4">
+              <div className={`mt-auto pt-4 ${preview ? 'hidden' : ''}`}>
                 {saved ? (
                   <>
                     <p className="flex items-center gap-1.5 text-sm font-semibold text-leaf">
@@ -100,6 +107,7 @@ function Vouchers({ onToast }: { onToast: (m: string) => void }) {
 function Rewards({ onToast }: { onToast: (m: string) => void }) {
   const { status, user } = useAuth();
   const { redeem, redeeming } = useRedeem();
+  const preview = useManagerPreview();
   // Bấm "Đổi" lần đầu chỉ hỏi lại, bấm lần nữa mới trừ điểm (tránh bấm nhầm)
   const [confirming, setConfirming] = useState<string | null>(null);
   useEffect(() => {
@@ -127,7 +135,7 @@ function Rewards({ onToast }: { onToast: (m: string) => void }) {
         <h2 id="rewards-title" className="scroll-mt-36 text-3xl font-black">
           Đổi điểm lấy quà
         </h2>
-        {authed ? (
+        {preview ? null : authed ? (
           <p className="text-right">
             <span className="kicker block">Điểm của bạn</span>
             <span className="font-display text-3xl font-black tabular-nums">{formatNumber(points)}</span>
@@ -147,7 +155,7 @@ function Rewards({ onToast }: { onToast: (m: string) => void }) {
             <li key={r.id} className="flex flex-col bg-cream p-4">
               <p className="font-mono text-sm text-gold">{formatNumber(r.cost)} điểm</p>
               <p className="mt-1 font-display text-lg font-bold leading-snug">{r.name}</p>
-              <div className="mt-auto pt-4">
+              <div className={`mt-auto pt-4 ${preview ? 'hidden' : ''}`}>
                 {!authed ? (
                   <p className="text-xs text-roast/60">Đăng nhập để đổi</p>
                 ) : enough ? (
