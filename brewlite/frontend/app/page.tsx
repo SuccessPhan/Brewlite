@@ -1,7 +1,7 @@
 import Link from 'next/link';
+import HomeSidebar from '@/components/home/HomeSidebar';
 import BestSellerRail from '@/components/menu/BestSellerRail';
 import MenuBrowser from '@/components/menu/MenuBrowser';
-import TodayPrices from '@/components/menu/TodayPrices';
 import { HERO_IMAGE, photo } from '@/lib/images';
 
 const STEPS = [
@@ -38,28 +38,7 @@ export default function HomePage() {
           </div>
         </article>
 
-        <aside className="lg:pl-8" aria-labelledby="prices-title">
-          <div className="mb-8 border-2 border-gold p-4">
-            <p className="kicker">Ưu đãi đang chạy</p>
-            <p className="mt-1 font-display text-2xl font-black leading-tight">Trả qua VNPay, giảm 20% mỗi đơn</p>
-            <p className="mt-2 text-sm text-roast/75">
-              Nhập mã <b className="font-mono text-gold">VNPAY20</b> khi thanh toán, giảm tới 25.000đ.
-            </p>
-          </div>
-          <h2 id="prices-title" className="kicker border-b-2 border-gold pb-1">Được gọi nhiều hôm nay</h2>
-          <TodayPrices />
-          <Link href="/menu" className="mt-3 inline-block font-label text-xs uppercase tracking-wider underline underline-offset-4 hover:text-gold">
-            Xem cả thực đơn →
-          </Link>
-          <div className="mt-8 border-2 border-roast p-4 text-center">
-            <p className="kicker">Thành viên mới</p>
-            <p className="mt-1 font-display text-2xl font-black leading-tight">Tặng 1.250 điểm khi đăng ký</p>
-            <p className="mt-2 text-sm text-roast/75">Đủ đổi một ly cà phê size S hoặc một bánh croissant bơ.</p>
-            <Link href="/register" className="mt-3 inline-block font-label text-xs uppercase tracking-wider underline underline-offset-4 hover:text-gold">
-              Đăng ký →
-            </Link>
-          </div>
-        </aside>
+        <HomeSidebar />
       </section>
 
       {/* Ba bước đặt món, chia cột như một mục chuyên đề */}

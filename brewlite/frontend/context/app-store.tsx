@@ -39,12 +39,17 @@ interface CartState {
   setQuantity: (lineId: string, quantity: number) => void;
   remove: (lineId: string) => void;
   clear: () => void;
+  /** Mã ưu đãi khách bấm "Dùng mã này" ở trang nhất; trang thanh toán tự áp */
+  voucher: string | null;
+  setVoucher: (code: string | null) => void;
 }
 
 export const useCartStore = create<CartState>()(
   persist(
     (set) => ({
       items: [],
+      voucher: null,
+      setVoucher: (voucher) => set({ voucher }),
       add: (item) => set((s) => ({ items: merge(s.items, item) })),
       addMany: (items) => set((s) => ({ items: items.reduce(merge, s.items) })),
       updateLine: (lineId, item) =>
@@ -60,7 +65,7 @@ export const useCartStore = create<CartState>()(
       setQuantity: (lineId, quantity) =>
         set((s) => ({ items: s.items.map((c) => (c.lineId === lineId ? { ...c, quantity: Math.max(1, Math.min(quantity, MAX_QTY)) } : c)) })),
       remove: (lineId) => set((s) => ({ items: s.items.filter((c) => c.lineId !== lineId) })),
-      clear: () => set({ items: [] }),
+      clear: () => set({ items: [], voucher: null }),
     }),
     { name: 'brewlite.cart', storage: createJSONStorage(() => localStorage), skipHydration: true },
   ),
@@ -95,5 +100,7 @@ export function useAppStore() {
     setQuantity: cart.setQuantity,
     removeFromCart: cart.remove,
     clearCart: cart.clear,
+    savedVoucher: cart.voucher,
+    setSavedVoucher: cart.setVoucher,
   };
 }

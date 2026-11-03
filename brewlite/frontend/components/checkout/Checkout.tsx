@@ -96,7 +96,7 @@ function ChoiceCard({ checked, onSelect, title, hint }: { checked: boolean; onSe
 export default function Checkout() {
   const router = useRouter();
   const queryClient = useQueryClient();
-  const { hydrated, cart, cartCount, subtotal, setQuantity, removeFromCart, clearCart } = useAppStore();
+  const { hydrated, cart, cartCount, subtotal, setQuantity, removeFromCart, clearCart, savedVoucher, setSavedVoucher } = useAppStore();
   const { status: authStatus, user, request, refresh } = useAuth();
   const { openProduct } = useProductSheet();
   const productMap = useProductMap();
@@ -114,6 +114,18 @@ export default function Checkout() {
   const [pay, setPay] = useState<PayState>({ step: 'idle' });
 
   const slots = useMemo(() => (hydrated ? buildSlots(new Date()) : []), [hydrated]);
+
+  // Mã đã chọn ở trang nhất: điền sẵn, mã VNPay thì chọn sẵn VNPay, đủ điều kiện là tự áp
+  useEffect(() => {
+    if (!savedVoucher || appliedCode) return;
+    setVoucherInput(savedVoucher);
+    if (savedVoucher === 'VNPAY20' && method === null) {
+      setMethod('VNPAY');
+      return;
+    }
+    const result = applyVoucher(savedVoucher, subtotal, fulfillment, method);
+    if (result.ok) setAppliedCode(result.code);
+  }, [savedVoucher, appliedCode, subtotal, fulfillment, method]);
 
   // ----- Tạm tính (backend sẽ tính lại khi tạo đơn) -----
   const voucher = appliedCode ? applyVoucher(appliedCode, subtotal, fulfillment, method) : null;
@@ -414,7 +426,14 @@ export default function Checkout() {
                     <p className="font-bold">{appliedCode}</p>
                     <p className={voucher?.ok ? 'text-leaf' : 'text-chili'}>{voucher?.ok ? voucher.label : voucher?.message}</p>
                   </div>
-                  <button type="button" onClick={() => setAppliedCode(null)} className="shrink-0 text-sm font-semibold text-espresso underline underline-offset-4">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setAppliedCode(null);
+                      setSavedVoucher(null);
+                    }}
+                    className="shrink-0 text-sm font-semibold text-espresso underline underline-offset-4"
+                  >
                     Bỏ mã
                   </button>
                 </div>

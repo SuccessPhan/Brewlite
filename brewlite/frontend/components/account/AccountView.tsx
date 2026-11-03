@@ -150,8 +150,8 @@ export default function AccountView() {
           )}
         </section>
 
-        {/* Đổi quà */}
-        <section className="rounded-3xl bg-foam p-5 sm:p-6">
+        {/* Đổi quà (trang nhất dẫn tới đây qua #doi-qua) */}
+        <section id="doi-qua" className="scroll-mt-36 rounded-3xl bg-foam p-5 sm:p-6">
           <h2 className="text-lg font-extrabold">Đổi quà bằng điểm</h2>
           <ul className="mt-3 space-y-2">
             {REWARDS.map((r) => {
