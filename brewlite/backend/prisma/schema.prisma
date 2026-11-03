@@ -231,3 +231,16 @@ model Favorite {
 
   @@id([userId, productId])
 }
+
+/// Góp ý gửi từ trang Liên hệ. Khách chưa đăng nhập vẫn gửi được; nhân viên đọc ở GET /staff/feedback
+model Feedback {
+  id        String   @id @default(uuid())
+  name      String
+  email     String
+  topic     String
+  orderCode String?
+  message   String
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+}

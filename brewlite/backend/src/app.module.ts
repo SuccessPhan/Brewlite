@@ -11,6 +11,7 @@ import { PrismaModule } from './prisma/prisma.module';
 import { ProductsModule } from './products/products.module';
 import { PromotionsModule } from './promotions/promotions.module';
 import { FavoritesModule } from './favorites/favorites.module';
+import { FeedbackModule } from './feedback/feedback.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { StaffModule } from './staff/staff.module';
 
@@ -32,6 +33,7 @@ import { StaffModule } from './staff/staff.module';
     StaffModule,
     NotificationsModule,
     FavoritesModule,
+    FeedbackModule,
   ],
   controllers: [AppController],
   providers: [AppService, { provide: APP_GUARD, useClass: ThrottlerGuard }],
