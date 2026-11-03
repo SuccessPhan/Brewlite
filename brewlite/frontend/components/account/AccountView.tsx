@@ -3,18 +3,18 @@
 // MÀN HÌNH TÀI KHOẢN: thẻ thành viên, giao dịch thanh toán, lịch sử đơn, đổi quà, lịch sử điểm, đăng xuất.
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useAppStore } from '@/context/app-store';
 import { useAuth } from '@/context/auth-context';
 import { useRedeem } from '@/lib/redeem';
 import { REWARDS } from '@/lib/mock-data';
 import { formatDateTime, formatNumber, formatVnd } from '@/lib/format';
-import { statusLabel, tierOf } from '@/lib/pricing';
+import { tierOf } from '@/lib/pricing';
 import { useMyOrders } from '@/lib/use-orders';
 import type { Level, Order, SizeId } from '@/lib/types';
 import { initialsOf } from '@/components/layout/UserMenu';
 import InvoiceModal from '@/components/orders/InvoiceModal';
-import RecentPayments from '@/components/payment/RecentPayments';
+import OrderStatusPill from '@/components/orders/OrderStatusPill';
 import Skeleton from '@/components/ui/Skeleton';
 import Toast from '@/components/ui/Toast';
 import { LogoutIcon } from '@/components/ui/Icons';
@@ -32,6 +32,12 @@ export default function AccountView() {
   const [toast, setToast] = useState<string | null>(null);
   const { redeem: redeemReward, redeeming } = useRedeem();
   const [showAllLog, setShowAllLog] = useState(false);
+  const [confirming, setConfirming] = useState<string | null>(null);
+  useEffect(() => {
+    if (!confirming) return;
+    const t = setTimeout(() => setConfirming(null), 4000);
+    return () => clearTimeout(t);
+  }, [confirming]);
 
   if (!user) return null;
 
@@ -58,7 +64,13 @@ export default function AccountView() {
     router.push('/checkout');
   }
 
+  // Bấm "Đổi quà" lần đầu chỉ hỏi lại, bấm lần nữa mới trừ điểm (giống trang Ưu đãi)
   async function redeem(rewardId: string) {
+    if (confirming !== rewardId) {
+      setConfirming(rewardId);
+      return;
+    }
+    setConfirming(null);
     const error = await redeemReward(rewardId);
     if (error) setToast(error);
   }
@@ -98,13 +110,10 @@ export default function AccountView() {
       </section>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-2">
-        {/* Giao dịch VNPay / điểm gần đây */}
-        <RecentPayments />
-
-        {/* Lịch sử đơn hàng */}
-        <section className="rounded-3xl bg-foam p-5 sm:p-6">
+        {/* Đơn hàng gần đây: khách chỉ cần nhìn đơn và trạng thái; các lần trả tiền chi tiết nằm ở Lịch sử giao dịch */}
+        <section className="rounded-3xl bg-foam p-5 sm:p-6 lg:col-span-2">
           <div className="flex items-baseline justify-between gap-3">
-            <h2 className="text-lg font-extrabold">Lịch sử đơn hàng</h2>
+            <h2 className="text-lg font-extrabold">Đơn hàng gần đây</h2>
             {orders && orders.length > 0 && (
               <Link href="/orders" className="text-sm font-semibold text-espresso underline underline-offset-4">
                 Xem tất cả
@@ -126,27 +135,44 @@ export default function AccountView() {
             </div>
           ) : (
             <ul className="mt-3 divide-y divide-roast/10">
-              {orders.slice(0, 5).map((o) => (
-                <li key={o.id} className="py-3">
-                  <div className="flex items-baseline justify-between gap-3">
-                    <Link href={`/orders/${o.id}`} className="font-bold hover:underline">
-                      #{o.id}
-                    </Link>
-                    <span className="font-semibold tabular-nums">{formatVnd(o.total)}</span>
-                  </div>
-                  <p className="text-xs text-roast/55">
-                    {formatDateTime(o.createdAt)}, {o.items.reduce((n, i) => n + i.qty, 0)} món, {statusLabel(o.status, o.fulfillment).toLowerCase()}
-                  </p>
-                  <div className="mt-2 flex gap-4 text-sm font-semibold">
-                    <button type="button" onClick={() => setInvoice(o)} className="text-espresso underline underline-offset-4">
-                      Xem hoá đơn
-                    </button>
-                    <button type="button" onClick={() => reorder(o)} className="text-espresso underline underline-offset-4">
-                      Đặt lại đơn này
-                    </button>
-                  </div>
-                </li>
-              ))}
+              {orders.slice(0, 5).map((o) => {
+                const unpaid = o.status === 'PENDING' || o.status === 'PAYMENT_FAILED';
+                return (
+                  <li key={o.id} className="flex flex-wrap items-center justify-between gap-x-6 gap-y-2 py-3">
+                    <div className="min-w-0">
+                      <div className="flex flex-wrap items-center gap-3">
+                        <Link href={`/orders/${o.id}`} className="font-bold hover:underline">
+                          #{o.id}
+                        </Link>
+                        <OrderStatusPill status={o.status} fulfillment={o.fulfillment} />
+                      </div>
+                      <p className="mt-0.5 text-xs text-roast/55">
+                        {formatDateTime(o.createdAt)} · {o.items.reduce((n, i) => n + i.qty, 0)} món
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-5">
+                      <span className="font-semibold tabular-nums">{formatVnd(o.total)}</span>
+                      <div className="flex gap-4 text-sm font-semibold">
+                        {unpaid ? (
+                          // Đơn chưa trả xong: việc cần làm là thanh toán tiếp (hoặc huỷ) ở trang đơn
+                          <Link href={`/orders/${o.id}`} className="font-label uppercase tracking-wider text-gold underline underline-offset-4">
+                            Thanh toán tiếp
+                          </Link>
+                        ) : (
+                          o.status !== 'CANCELLED' && (
+                            <button type="button" onClick={() => setInvoice(o)} className="text-espresso underline underline-offset-4">
+                              Hoá đơn
+                            </button>
+                          )
+                        )}
+                        <button type="button" onClick={() => reorder(o)} className="text-espresso underline underline-offset-4">
+                          Đặt lại
+                        </button>
+                      </div>
+                    </div>
+                  </li>
+                );
+              })}
             </ul>
           )}
         </section>
@@ -176,7 +202,7 @@ export default function AccountView() {
                       onClick={() => redeem(r.id)}
                       className="shrink-0 rounded-full bg-gold px-4 py-2 text-sm font-bold text-foam enabled:hover:bg-gold-deep disabled:opacity-50"
                     >
-                      {redeeming === r.id ? 'Đang đổi…' : 'Đổi quà'}
+                      {redeeming === r.id ? 'Đang đổi…' : confirming === r.id ? `Bấm lần nữa: trừ ${formatNumber(r.cost)} điểm` : 'Đổi quà'}
                     </button>
                   </li>
                 ))}
