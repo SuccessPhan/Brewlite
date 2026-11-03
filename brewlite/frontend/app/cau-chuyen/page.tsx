@@ -4,7 +4,7 @@ import Article from '@/components/layout/Article';
 import { AUTH_IMAGE, photo } from '@/lib/images';
 import { STORE } from '@/lib/mock-data';
 
-export const metadata: Metadata = { title: 'Câu chuyện – BrewLite', description: 'Một quầy cà phê nhỏ ở góc An Dương Vương: từ hạt rang mộc tới ly pha phin.' };
+export const metadata: Metadata = { title: 'Câu chuyện – BrewLite', description: 'Quầy cà phê nhỏ ở góc An Dương Vương, nhưng cái tâm thì không nhỏ: từ hạt rang mộc tới ly pha phin.' };
 
 // Từ hạt tới ly: bốn chặng, mỗi chặng một ảnh in cùng tông với thực đơn
 const JOURNEY = [
@@ -33,7 +33,7 @@ const MAP_URL = `https://www.google.com/maps/search/?api=1&query=${encodeURIComp
 
 export default function StoryPage() {
   return (
-    <Article kicker="Câu chuyện" title="Một quầy cà phê nhỏ ở góc An Dương Vương" lead="Sáng nào cũng có một hàng dài người đứng chờ gọi món. Chúng tôi muốn bạn khỏi phải chờ.">
+    <Article kicker="Câu chuyện" title="Quầy cà phê nhỏ, nhưng cái tâm thì không nhỏ" lead="Sáng nào cũng có một hàng dài người đứng chờ gọi món. Chúng tôi muốn bạn khỏi phải chờ.">
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={photo(AUTH_IMAGE, 1200)} alt="Barista rót sữa vào ly cà phê" className="newsprint aspect-[21/9] w-full object-cover" />
       <div className="mt-6 gap-8 sm:columns-2">
