@@ -31,7 +31,7 @@ export function Stat({ label, value, hint, tone }: { label: string; value: React
   return (
     <div className="border-2 border-roast bg-cream p-4">
       <p className="font-label text-[11px] font-semibold uppercase tracking-wider text-roast/60">{label}</p>
-      <p className={`mt-1 break-words font-display text-xl font-black leading-none tabular-nums sm:text-3xl ${tone ?? ''}`}>{value}</p>
+      <p className={`mt-1 whitespace-nowrap font-display text-xl font-black leading-none tabular-nums sm:text-2xl xl:text-3xl ${tone ?? ''}`}>{value}</p>
       {hint && <p className="mt-1.5 text-xs text-roast/65">{hint}</p>}
     </div>
   );

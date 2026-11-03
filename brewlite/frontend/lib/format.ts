@@ -3,8 +3,9 @@ import type { SizeId } from './types';
 
 const vnd = new Intl.NumberFormat('vi-VN');
 
+/** Tiền luôn làm tròn tới đồng (giá vốn bình quân, tồn theo kg/lít có thể ra số lẻ) */
 export function formatVnd(amount: number): string {
-  return `${vnd.format(amount)}đ`;
+  return `${vnd.format(Math.round(amount))}đ`;
 }
 
 export function formatNumber(n: number): string {

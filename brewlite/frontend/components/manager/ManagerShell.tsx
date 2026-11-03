@@ -4,7 +4,6 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import type { ReactNode } from 'react';
-import { SHOW_DEMO_HINTS } from '@/lib/demo';
 import { stateOf, useInventory } from '@/lib/inventory';
 import { MANAGER_GROUPS } from '@/lib/manager-nav';
 import { useFeedbackList } from '@/lib/feedback-admin';
@@ -69,11 +68,6 @@ function ManagerNav({ children }: { children: ReactNode }) {
       </div>
 
       <div className="min-w-0">
-        {SHOW_DEMO_HINTS && (
-          <p className="mb-4 border-l-4 border-gold bg-gold/10 px-3 py-2 text-xs text-roast/75">
-            Chế độ trình bày: kho, thực đơn, mã giảm giá và nội dung trang đang lưu tạm trên trình duyệt (phản hồi của khách là dữ liệu thật). Tải lại trang sẽ về như ban đầu.
-          </p>
-        )}
         {children}
       </div>
     </div>
