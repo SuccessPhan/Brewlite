@@ -145,9 +145,10 @@ button { text-transform: uppercase; }
 .newsprint { filter: grayscale(0.85) sepia(0.2) contrast(1.05); transition: filter 0.5s ease; }
 .group:hover .newsprint, .newsprint:hover { filter: none; }
 /* Ảnh món trong thực đơn: in cùng một tông đen trắng ngả sépia, nền sáng hoà vào màu giấy,
-   để ảnh chụp ở nhiều nơi khác nhau trông như cùng một bộ ảnh */
-.menu-print { filter: grayscale(1) sepia(0.28) contrast(1.12) brightness(1.04); mix-blend-mode: multiply; transition: transform 0.6s ease; }
-.group:hover .menu-print { transform: scale(1.04); }
+   để ảnh chụp ở nhiều nơi khác nhau trông như cùng một bộ ảnh; rê chuột thì hiện màu */
+.menu-print { filter: grayscale(1) sepia(0.28) contrast(1.12) brightness(1.04); mix-blend-mode: multiply; transition: filter 0.5s ease, transform 0.6s ease; }
+/* Rê chuột vào món thì ảnh hiện màu thật và phóng nhẹ */
+.group:hover .menu-print { filter: none; mix-blend-mode: normal; transform: scale(1.04); }
 
 :focus-visible {
   outline: 2px solid var(--color-gold-deep);
