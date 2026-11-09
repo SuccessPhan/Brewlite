@@ -18,15 +18,16 @@ Bài tập lớn môn Công nghệ Phần mềm · Học kỳ I, năm học 2026
 2. [Tính năng chính](#tính-năng-chính)
 3. [Công nghệ sử dụng](#công-nghệ-sử-dụng)
 4. [Cài đặt và chạy dự án](#cài-đặt-và-chạy-dự-án)
-5. [Kịch bản demo](#kịch-bản-demo)
+5. [Kịch bản demo end-to-end](#kịch-bản-demo-end-to-end)
 6. [Product Backlog và mã nguồn](#product-backlog-và-mã-nguồn)
-7. [Nghiệp vụ backend nâng cao](#nghiệp-vụ-backend-nâng-cao)
-8. [Kiểm thử](#kiểm-thử)
-9. [Tài liệu API](#tài-liệu-api)
-10. [Cấu trúc thư mục](#cấu-trúc-thư-mục)
-11. [Biến môi trường](#biến-môi-trường)
-12. [Xử lý sự cố](#xử-lý-sự-cố)
-13. [Quy ước làm việc nhóm](#quy-ước-làm-việc-nhóm)
+7. [Task 10: nghiệp vụ backend](#task-10-nghiệp-vụ-backend) (kèm test chứng minh)
+8. [Bảo mật](#bảo-mật)
+9. [Gọi API bằng Thunder Client](#gọi-api-bằng-thunder-client)
+10. [API](#api)
+11. [Cấu trúc thư mục](#cấu-trúc-thư-mục)
+12. [Biến môi trường](#biến-môi-trường)
+13. [Lỗi thường gặp](#lỗi-thường-gặp)
+14. [Làm việc nhóm](#làm-việc-nhóm)
 
 ---
 
@@ -111,7 +112,9 @@ Trên trang VNPay chọn **Thẻ nội địa và tài khoản ngân hàng → N
 
 > **Đã chạy bản cũ trước đây?** Bản này bỏ tài khoản ảo và đổi bảng thanh toán sang VNPay, nên `docker-compose.yml` dùng kho dữ liệu mới `pgdata_v3`, tự tạo CSDL sạch. Muốn xoá dữ liệu làm lại từ đầu (ví dụ trước buổi demo): nhấp đúp `reset-database.bat`.
 
-## Kịch bản demo end-to-end (khoảng 5 phút)
+## Kịch bản demo end-to-end
+
+Khoảng 5 phút, đi đúng luồng bàn giao của đề: chọn món → giỏ hàng → thanh toán → xác nhận đơn.
 
 1. Trang chủ: menu lấy từ `GET /products`. Gõ `bx` vào ô tìm kiếm để thấy tìm kiếm thông minh. Món **Bánh croissant** có tồn kho thấp, **Brownie** chỉ còn 5 phần.
 2. Bấm **+** trên một món → chọn size, đường, đá, topping → món bay vào giỏ, badge giỏ hàng tăng.
@@ -126,7 +129,7 @@ Trên trang VNPay chọn **Thẻ nội địa và tài khoản ngân hàng → N
 11. **Theo dõi đơn hàng**: mã đơn để đọc tại quầy An Dương Vương. Mở cửa sổ ẩn danh, mở `/login`, đăng nhập `staff@brewlite.vn` → vào thẳng **Quầy pha chế**: bấm *Bắt đầu pha* → *Pha xong* → *Đã giao khách*; trang theo dõi đơn của khách tự cập nhật PAID → PREPARING → READY → COMPLETED.
 12. Mở terminal chạy `npm run test` và `npm run test:int` trong `backend` để chứng minh Task 10 và việc xử lý kết quả VNPay.
 
-## Product Backlog → mã nguồn
+## Product Backlog và mã nguồn
 
 | # | Task | Nằm ở đâu |
 |---|---|---|
@@ -141,7 +144,7 @@ Trên trang VNPay chọn **Thẻ nội địa và tài khoản ngân hàng → N
 | 9 | Xác nhận, lịch sử, bàn giao | Trang kết quả `VnpayReturn.tsx`, lịch sử giao dịch `GET /payments/me`, `GET /orders/me`, Docker Compose, README này |
 | 10 | Nghiệp vụ backend | Xem mục dưới |
 
-## Task 10 – nghiệp vụ backend
+## Task 10: nghiệp vụ backend
 
 **1. Máy trạng thái đơn hàng** – `backend/src/orders/order-state-machine.ts`
 
@@ -289,19 +292,28 @@ brewlite/
 ├── reset-database.bat        Xoá dữ liệu, làm lại CSDL từ đầu
 ├── backend/                  NestJS – cổng 3001
 │   ├── prisma/schema.prisma  User, Product, Topping, Order, OrderItem, Payment, PaymentLog, Voucher, LoyaltyTransaction
-│   ├── src/auth/             đăng ký, đăng nhập, JWT Passport
-│   ├── src/products/         GET /products
-│   ├── src/orders/           tạo đơn, máy trạng thái, tồn kho
+│   ├── src/auth/             đăng ký, đăng nhập, JWT Passport, phân quyền, đổi điểm
+│   ├── src/products/         GET /products, GET /products/:id
+│   ├── src/promotions/       luật mã giảm giá
+│   ├── src/favorites/        món yêu thích
+│   ├── src/orders/           báo giá, tạo đơn, máy trạng thái, tồn kho, huỷ đơn
 │   ├── src/payments/         thanh toán idempotent, Return URL, IPN, đối soát, lịch sử giao dịch
 │   ├── src/payments/vnpay/   ký / kiểm chữ ký VNPay, tạo link, gọi API querydr
-│   ├── src/promotions/       mã giảm giá, điểm thưởng
+│   ├── src/notifications/    thông báo đổi trạng thái đơn
+│   ├── src/staff/            quầy pha chế (phần mở rộng)
+│   ├── src/manage/           quản lý cửa hàng: tổng quan, thực đơn, mã giảm giá, nội dung
+│   ├── src/inventory/        kho nguyên liệu, phiếu nhập, công thức
+│   ├── src/customers/        khoá, mở khoá tài khoản khách
+│   ├── src/feedback/         phản hồi khách
 │   ├── src/seed.ts           dữ liệu mẫu
+│   ├── src/db-harden.ts      rào CSDL (tài khoản app chỉ đọc/ghi dữ liệu)
 │   └── test/                 integration test (PostgreSQL thật)
-└── frontend/                 Next.js – cổng 3000
-    ├── app/                  các trang
-    ├── components/           giao diện
-    ├── context/              Zustand (giỏ hàng), đăng nhập
-    └── lib/                  gọi API, React Query, tìm kiếm, định dạng
+├── frontend/                 Next.js – cổng 3000
+│   ├── app/                  các trang (khách, quầy /staff, quản lý /quan-ly)
+│   ├── components/           giao diện
+│   ├── context/              Zustand (giỏ hàng), đăng nhập
+│   └── lib/                  gọi API, React Query, tìm kiếm, định dạng
+└── thunder-client/           bộ request kiểm thử API và lệnh chạy toàn bộ
 ```
 
 ## Biến môi trường
@@ -331,17 +343,14 @@ brewlite/
 - **Đóng trình duyệt giữa chừng, đơn vẫn "Chờ thanh toán"**: vào Lịch sử giao dịch, mở giao dịch, bấm *Kiểm tra lại với VNPay*.
 - Ghi chú: dùng `bcryptjs` (cùng thuật toán bcrypt, viết bằng JavaScript) để khỏi phải biên dịch thư viện C++ trên Windows.
 
-## Quy ước làm việc nhóm
-
-- Không push thẳng vào `main`; làm trên nhánh `feat/task-<số>-<mô-tả>`.
-- Mỗi Pull Request cần ít nhất 1 thành viên khác duyệt.
-- Commit theo dạng: `feat: ...`, `fix: ...`, `docs: ...`, `test: ...`, `chore: ...`.
-
 ## Làm việc nhóm
 
-Xem [CONTRIBUTING.md](CONTRIBUTING.md): tạo nhánh riêng, commit bằng tài khoản của mình, mở pull request và nhờ một bạn review trước khi merge.
+Nhóm làm theo Scrum và Definition of Done của đề: code chạy được, không lỗi build, đúng tiêu chí chấp nhận của task; có commit với mô tả rõ ràng và được review trong nhóm; API validate đầu vào, giao diện xử lý trạng thái đang tải và lỗi; có hướng dẫn chạy trong README.
 
-Phân công và luồng đặt món theo từng người: [docs/phan-cong-brewlite.pdf](docs/phan-cong-brewlite.pdf); file phụ trách cụ thể xem bảng trong CONTRIBUTING.md.
+- Mỗi phần việc làm trên một nhánh riêng (`feat/...`, `fix/...`, `docs/...`), merge vào `main` sau khi một bạn khác review.
+- Commit theo dạng `<loại>(<phần>): <mô tả>`, ví dụ `feat(orders): ...`, `fix: ...`, `docs: ...`, `test: ...`, `chore: ...`.
+- Cách làm chi tiết và bảng file phụ trách của từng người: [CONTRIBUTING.md](CONTRIBUTING.md).
+- Phân công và luồng đặt món theo từng người: [docs/phan-cong-brewlite.pdf](docs/phan-cong-brewlite.pdf).
 
 ---
 
